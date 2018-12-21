@@ -1,0 +1,46 @@
+{
+  "name": "roto-broker",
+  "description": "helping ffballers trade!",
+  "version": "1.0.0",
+  "author": "Erik Nelson <erik@ejnelson.com>",
+  "dependencies": {
+    "babel-plugin-styled-components": "^1.10.0",
+    "firebase": "^5.7.0",
+    "gatsby": "^2.0.73",
+    "gatsby-plugin-flow": "^1.0.2",
+    "gatsby-plugin-layout": "^1.0.10",
+    "gatsby-plugin-manifest": "^2.0.12",
+    "gatsby-plugin-offline": "^2.0.20",
+    "gatsby-plugin-react-helmet": "^3.0.4",
+    "gatsby-plugin-styled-components": "^3.0.4",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-firebaseui": "^3.1.2",
+    "react-helmet": "^5.2.0",
+    "react-sortable-hoc": "^0.8.4",
+    "short-id": "0.1.0-1",
+    "styled-components": "^4.1.3"
+  },
+  "keywords": [
+    "gatsby"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "format": "prettier --write '**/*.js'",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "flow": "flow"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^3.3.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "flow-bin": "^0.89.0",
+    "prettier": "^1.15.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
