@@ -31,6 +31,9 @@ class IndexPage extends Component {
         {
           text: "option1",
           id: "123avcs232",
+          rank: 1,
+          position: "RB",
+          team: "LAR",
           editing: false,
         },
       ],
@@ -39,8 +42,11 @@ class IndexPage extends Component {
   createOptionsFromRanks = async ranksList => {
     return ranksList.map((player, i) => {
       return {
-        text: player.Overall,
+        name: player.Overall,
         id: shortId.generate(),
+        position: player.Pos,
+        team: player.Team,
+        rank: i + 1,
         editing: false,
       };
     });
@@ -65,7 +71,7 @@ class IndexPage extends Component {
   handleToggleEdit = id => {
     this.setState(prevState => {
       const options = prevState.options
-        .filter(({ text }) => text)
+        .filter(({ name }) => name)
         .map(option => {
           if (option.id === id) {
             if (!option.editing) {
@@ -93,24 +99,6 @@ class IndexPage extends Component {
     });
   };
 
-  handleTextChange = (e, id) => {
-    const options = this.state.options.map(option => {
-      if (option.id === id) {
-        return {
-          ...option,
-          text: e.target.value,
-        };
-      }
-
-      return option;
-    });
-
-    this.setState({
-      ...this.state,
-      options,
-    });
-  };
-
   handleSortEnd = ({ oldIndex, newIndex }) => {
     this.setState({
       ...this.state,
@@ -118,40 +106,6 @@ class IndexPage extends Component {
     });
   };
 
-  handleAddItem = () => {
-    // if the user spams add w/o writing any text the items w/o any text get removed
-    const options = this.state.options
-      // filter out any falsy values from the list
-      .filter(Boolean)
-      .filter(({ text }) => text)
-      .map(option => ({
-        ...option,
-        editing: false,
-      }));
-    const id = shortId.generate();
-    this.editing = id;
-
-    this.setState({
-      ...this.state,
-      options: [
-        ...options,
-        {
-          id,
-          text: "",
-          editing: true,
-        },
-      ],
-    });
-  };
-
-  handleDelete = id => {
-    const options = this.state.options.filter(option => option.id !== id);
-
-    this.setState({
-      ...this.state,
-      options,
-    });
-  };
   writeUserData(userId, name, email, imageUrl, ranks) {
     const { firebase } = this.props;
     firebase
@@ -174,9 +128,7 @@ class IndexPage extends Component {
       email = user.email;
       photoUrl = user.photoURL;
       emailVerified = user.emailVerified;
-      uid = user.uid; // The user's ID, unique to the Firebase project. Do NOT use
-      // this value to authenticate with your backend server, if
-      // you have one. Use User.getToken() instead.
+      uid = user.uid;
     }
     console.log(name + email + photoUrl + uid + emailVerified);
     this.writeUserData(uid, name, email, photoUrl, this.state.options);
@@ -189,14 +141,11 @@ class IndexPage extends Component {
         <h1>Hi people</h1>
         <p>Make some rankings!!!</p>
 
-        {/* <FetchingExample /> */}
         <DraggableList
           options={options}
           onToggleEdit={this.handleToggleEdit}
-          onTextChange={this.handleTextChange}
           onKeyDown={this.handleKeydown}
           onSortEnd={this.handleSortEnd}
-          onDelete={this.handleDelete}
         />
         <Link to="/page-2/">Go to page 2</Link>
         <button onClick={this.handleClick}> CLICK HERE</button>

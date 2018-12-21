@@ -24,12 +24,6 @@ const OptionItemContainer = styled.li`
   min-height: 36px;
 `;
 
-const OptionInputItem = styled.input`
-  border: none;
-  background-color: inherit;
-  width: 100%;
-`;
-
 const ActionItem = styled.div`
   position: absolute;
   right: ${props => (props.right ? `${props.right}px` : "10px")};
@@ -41,22 +35,13 @@ const ActionItem = styled.div`
 const DragHandle = SortableHandle(() => <ActionItem>:::</ActionItem>);
 
 const SortableItem = SortableElement(
-  ({ text, id, onToggleEdit, onKeyDown, onTextChange, onDelete, editing }) => (
+  ({ name, rank, team, position, id, onToggleEdit, onKeyDown, editing }) => (
     <OptionItemContainer
       key={id}
       onDoubleClick={() => !editing && onToggleEdit(id)}
       onBlur={() => onToggleEdit(id)}
     >
-      {editing ? (
-        <OptionInputItem
-          autoFocus
-          value={text}
-          onChange={e => onTextChange(e, id)}
-          onKeyDown={onKeyDown}
-        />
-      ) : (
-        text
-      )}
+      {name + " , " + rank + " , " + team + " , " + position}
       {/* <ActionItem
         editing
         onClick={() => onDelete(id)}
@@ -89,10 +74,8 @@ const DraggableList = props => (
 DraggableList.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   onToggleEdit: PropTypes.func.isRequired,
-  onTextChange: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
   onSortEnd: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
 export default DraggableList;
