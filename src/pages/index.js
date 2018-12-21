@@ -1,25 +1,19 @@
 import React, { Component } from "react";
 import { Link } from "gatsby";
-import styled from "styled-components";
+// import styled from "styled-components";
 import { arrayMove } from "react-sortable-hoc";
-import shortId from "short-id";
 
 import { withFirebase } from "../components/FirebaseContext";
-import Layout from "../components/layout.js";
-import FetchingExample from "../containers/FetchingExample";
+import Layout from "../components/layout";
 import SignOut from "../containers/SignOut";
 import DraggableList from "../containers/DraggableList";
-import getAllRanks from "../services/getRanks";
-
-const CreateButton = styled.button`
-  background-image: linear-gradient(19deg, #21d4fd 0%, #b721ff 100%);
-  margin-left: 20px;
-`;
+import getAllOptions from "../services/getRanks";
 
 class IndexPage extends Component {
   state = {
-    options: [],
+    options: []
   };
+
   // to keep track of what item is being edited
   editing = null;
 
@@ -34,31 +28,17 @@ class IndexPage extends Component {
           rank: 1,
           position: "RB",
           team: "LAR",
-          editing: false,
-        },
-      ],
+          editing: false
+        }
+      ]
     };
   }
-  createOptionsFromRanks = async ranksList => {
-    return ranksList.map((player, i) => {
-      return {
-        name: player.Overall,
-        id: shortId.generate(),
-        position: player.Pos,
-        team: player.Team,
-        rank: i + 1,
-        editing: false,
-      };
-    });
-  };
 
   componentDidMount() {
     const { firebase } = this.props;
-    let ranks = getAllRanks(firebase).then(ranks =>
-      this.createOptionsFromRanks(ranks).then(optionsMap => {
-        this.setState({
-          options: optionsMap,
-        });
+    getAllOptions(firebase).then(options =>
+      this.setState({
+        options
       })
     );
   }
@@ -82,57 +62,64 @@ class IndexPage extends Component {
 
             return {
               ...option,
-              editing: !option.editing,
+              editing: !option.editing
             };
           }
 
           return {
             ...option,
-            editing: false,
+            editing: false
           };
         });
 
       return {
         ...prevState,
-        options,
+        options
       };
     });
   };
 
+  // handleSortEnd = ({ oldIndex, newIndex }) => {
+  //   this.setState({
+  //     ...this.state,
+  //     options: arrayMove(this.state.options, oldIndex, newIndex)
+  //   });
+  // };
   handleSortEnd = ({ oldIndex, newIndex }) => {
-    this.setState({
-      ...this.state,
-      options: arrayMove(this.state.options, oldIndex, newIndex),
-    });
+    this.setState(prevState => ({
+      ...prevState,
+      options: arrayMove(prevState.options, oldIndex, newIndex)
+    }));
   };
 
   writeUserData(userId, name, email, imageUrl, ranks) {
     const { firebase } = this.props;
     firebase
       .database()
-      .ref("users/" + userId)
+      .ref(`users/${userId}`)
       .set({
         username: name,
-        email: email,
+        email,
         profile_picture: imageUrl,
-        ranks: ranks,
+        ranks
       });
   }
+
   handleClick() {
     const { firebase } = this.props;
-    var user = firebase.auth().currentUser;
-    var name, email, photoUrl, uid, emailVerified;
+    const { options } = this.state;
+    const {
+      displayName,
+      email,
+      photoUrl,
+      emailVerified,
+      uid
+    } = firebase.auth().currentUser;
 
-    if (user != null) {
-      name = user.displayName;
-      email = user.email;
-      photoUrl = user.photoURL;
-      emailVerified = user.emailVerified;
-      uid = user.uid;
-    }
-    console.log(name + email + photoUrl + uid + emailVerified);
-    this.writeUserData(uid, name, email, photoUrl, this.state.options);
+    console.log(displayName + email + photoUrl + uid + emailVerified);
+    this.writeUserData(uid, displayName, email, photoUrl, options);
   }
+
   render() {
     const { options } = this.state;
 
@@ -148,7 +135,9 @@ class IndexPage extends Component {
           onSortEnd={this.handleSortEnd}
         />
         <Link to="/page-2/">Go to page 2</Link>
-        <button onClick={this.handleClick}> CLICK HERE</button>
+        <button type="button" onClick={this.handleClick}>
+          CLICK HERE
+        </button>
 
         <SignOut />
       </Layout>

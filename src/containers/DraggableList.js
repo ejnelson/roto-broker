@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import {
   SortableContainer,
   SortableElement,
-  SortableHandle,
+  SortableHandle
 } from "react-sortable-hoc";
 
 const OptionsContainer = styled.ul`
@@ -35,13 +35,13 @@ const ActionItem = styled.div`
 const DragHandle = SortableHandle(() => <ActionItem>:::</ActionItem>);
 
 const SortableItem = SortableElement(
-  ({ name, rank, team, position, id, onToggleEdit, onKeyDown, editing }) => (
+  ({ name, rank, team, position, id, onToggleEdit, editing }) => (
     <OptionItemContainer
       key={id}
       onDoubleClick={() => !editing && onToggleEdit(id)}
       onBlur={() => onToggleEdit(id)}
     >
-      {name + " , " + rank + " , " + team + " , " + position}
+      `{name} , {rank} , {team} , {position}`
       {/* <ActionItem
         editing
         onClick={() => onDelete(id)}
@@ -55,17 +55,13 @@ const SortableItem = SortableElement(
   )
 );
 
-const SortableList = SortableContainer(({ options, ...props }) => {
-  return (
-    <OptionsContainer>
-      {options.filter(Boolean).map((option, index) => {
-        return (
-          <SortableItem {...option} {...props} index={index} key={option.id} />
-        );
-      })}
-    </OptionsContainer>
-  );
-});
+const SortableList = SortableContainer(({ options, ...props }) => (
+  <OptionsContainer>
+    {options.filter(Boolean).map((option, index) => (
+      <SortableItem {...option} {...props} index={index} key={option.id} />
+    ))}
+  </OptionsContainer>
+));
 
 const DraggableList = props => (
   <SortableList {...props} lockAxis="y" useDragHandle lockToContainerEdges />
@@ -75,7 +71,7 @@ DraggableList.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   onToggleEdit: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
-  onSortEnd: PropTypes.func.isRequired,
+  onSortEnd: PropTypes.func.isRequired
 };
 
 export default DraggableList;
