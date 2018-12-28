@@ -7,7 +7,7 @@ import { withFirebase } from "../components/FirebaseContext";
 import Layout from "../components/layout";
 import SignOut from "../containers/SignOut";
 import DraggableList from "../containers/DraggableList";
-// import getAllOptions from "../services/getRanks";
+import getAllOptions from "../services/getRanks";
 
 class IndexPage extends Component {
   state = {
@@ -16,18 +16,15 @@ class IndexPage extends Component {
 
   optionsRef = null;
 
-  // to keep track of what item is being edited
-  editing = null;
-
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
+    this.resetRanks = this.resetRanks.bind(this);
     const { firebase } = props;
     const { uid } = firebase.auth().currentUser;
     this.optionsRef = firebase.database().ref(`users/${uid}/ranks`);
 
     this.optionsRef.once("value", options => {
-      console.log(options.val());
       this.setState({
         options: options.val()
       });
@@ -40,7 +37,6 @@ class IndexPage extends Component {
   }
 
   handleKeydown = e => {
-    if (e.which === 27) this.handleToggleEdit(this.editing);
     if (e.which === 13) this.handleAddItem();
   };
 
@@ -82,6 +78,17 @@ class IndexPage extends Component {
     this.writeUserData(uid, displayName, email, photoUrl, options);
   }
 
+  resetRanks() {
+    const { firebase } = this.props;
+    getAllOptions(firebase).then(options => {
+      this.optionsRef.set(options);
+      this.setState(prevState => ({
+        ...prevState,
+        options
+      }));
+    });
+  }
+
   render() {
     const { options } = this.state;
 
@@ -99,7 +106,9 @@ class IndexPage extends Component {
         <button type="button" onClick={this.handleClick}>
           CLICK HERE
         </button>
-
+        <button type="button" onClick={this.resetRanks}>
+          Reset ranks
+        </button>
         <SignOut />
       </Layout>
     );

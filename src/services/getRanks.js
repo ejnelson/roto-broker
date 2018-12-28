@@ -6,8 +6,7 @@ const createOptionsFromRanks = async ranksList =>
     id: shortId.generate(),
     position: player.Pos,
     team: player.Team,
-    rank: i + 1,
-    editing: false
+    rank: i + 1
   }));
 
 const getAllOptions = async firebase => {
