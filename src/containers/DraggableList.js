@@ -34,15 +34,10 @@ const ActionItem = styled.div`
 
 const DragHandle = SortableHandle(() => <ActionItem>:::</ActionItem>);
 
-const SortableItem = SortableElement(
-  ({ name, rank, team, position, id, onToggleEdit, editing }) => (
-    <OptionItemContainer
-      key={id}
-      onDoubleClick={() => !editing && onToggleEdit(id)}
-      onBlur={() => onToggleEdit(id)}
-    >
-      `{name} , {rank} , {team} , {position}`
-      {/* <ActionItem
+const SortableItem = SortableElement(({ name, rank, team, position, id }) => (
+  <OptionItemContainer key={id}>
+    `{name} , {rank} , {team} , {position}`
+    {/* <ActionItem
         editing
         onClick={() => onDelete(id)}
         right={40}
@@ -50,10 +45,9 @@ const SortableItem = SortableElement(
       >
         x
       </ActionItem> */}
-      <DragHandle />
-    </OptionItemContainer>
-  )
-);
+    <DragHandle />
+  </OptionItemContainer>
+));
 
 const SortableList = SortableContainer(({ options, ...props }) => (
   <OptionsContainer>
@@ -69,7 +63,6 @@ const DraggableList = props => (
 
 DraggableList.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onToggleEdit: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
   onSortEnd: PropTypes.func.isRequired
 };

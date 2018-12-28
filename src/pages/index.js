@@ -7,12 +7,14 @@ import { withFirebase } from "../components/FirebaseContext";
 import Layout from "../components/layout";
 import SignOut from "../containers/SignOut";
 import DraggableList from "../containers/DraggableList";
-import getAllOptions from "../services/getRanks";
+// import getAllOptions from "../services/getRanks";
 
 class IndexPage extends Component {
   state = {
     options: []
   };
+
+  optionsRef = null;
 
   // to keep track of what item is being edited
   editing = null;
@@ -20,27 +22,21 @@ class IndexPage extends Component {
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
-    this.state = {
-      options: [
-        {
-          text: "option1",
-          id: "123avcs232",
-          rank: 1,
-          position: "RB",
-          team: "LAR",
-          editing: false
-        }
-      ]
-    };
+    const { firebase } = props;
+    const { uid } = firebase.auth().currentUser;
+    this.optionsRef = firebase.database().ref(`users/${uid}/ranks`);
+
+    this.optionsRef.once("value", options => {
+      console.log(options.val());
+      this.setState({
+        options: options.val()
+      });
+    });
   }
 
-  componentDidMount() {
+  componentWillUnmount() {
     const { firebase } = this.props;
-    getAllOptions(firebase).then(options =>
-      this.setState({
-        options
-      })
-    );
+    firebase.removeBinding(this.optionsRef);
   }
 
   handleKeydown = e => {
@@ -48,47 +44,13 @@ class IndexPage extends Component {
     if (e.which === 13) this.handleAddItem();
   };
 
-  handleToggleEdit = id => {
-    this.setState(prevState => {
-      const options = prevState.options
-        .filter(({ name }) => name)
-        .map(option => {
-          if (option.id === id) {
-            if (!option.editing) {
-              this.editing = id;
-            } else {
-              this.editing = null;
-            }
-
-            return {
-              ...option,
-              editing: !option.editing
-            };
-          }
-
-          return {
-            ...option,
-            editing: false
-          };
-        });
-
-      return {
-        ...prevState,
-        options
-      };
-    });
-  };
-
-  // handleSortEnd = ({ oldIndex, newIndex }) => {
-  //   this.setState({
-  //     ...this.state,
-  //     options: arrayMove(this.state.options, oldIndex, newIndex)
-  //   });
-  // };
   handleSortEnd = ({ oldIndex, newIndex }) => {
+    const { options } = this.state;
+    const newOrder = arrayMove(options, oldIndex, newIndex);
+    this.optionsRef.set(newOrder);
     this.setState(prevState => ({
       ...prevState,
-      options: arrayMove(prevState.options, oldIndex, newIndex)
+      options: newOrder
     }));
   };
 
@@ -130,7 +92,6 @@ class IndexPage extends Component {
 
         <DraggableList
           options={options}
-          onToggleEdit={this.handleToggleEdit}
           onKeyDown={this.handleKeydown}
           onSortEnd={this.handleSortEnd}
         />
