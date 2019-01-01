@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "gatsby";
+import SignOut from "../containers/SignOut";
 
 const Header = ({ siteTitle }) => (
   <div
@@ -16,16 +17,19 @@ const Header = ({ siteTitle }) => (
       }}
     >
       <h1 style={{ margin: 0 }}>
-        <Link
-          to="/"
-          style={{
-            color: "white",
-            textDecoration: "none"
-          }}
-        >
-          {siteTitle}
-        </Link>
+        <Link to="/">{siteTitle}</Link>
       </h1>
+      <Link
+        to="/ranks"
+        style={{
+          color: "white",
+          textDecoration: "none"
+        }}
+      >
+        ranks
+      </Link>{" "}
+      | <Link to="/trades/">trades</Link>
+      <SignOut />
     </div>
   </div>
 );

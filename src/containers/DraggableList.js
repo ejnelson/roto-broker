@@ -36,7 +36,7 @@ const DragHandle = SortableHandle(() => <ActionItem>:::</ActionItem>);
 
 const SortableItem = SortableElement(({ name, rank, team, position, id }) => (
   <OptionItemContainer key={id}>
-    `{name} , {rank} , {team} , {position}`
+    {name}, {rank}, {team}, {position}
     {/* <ActionItem
         editing
         onClick={() => onDelete(id)}
@@ -63,7 +63,6 @@ const DraggableList = props => (
 
 DraggableList.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onKeyDown: PropTypes.func.isRequired,
   onSortEnd: PropTypes.func.isRequired
 };
 

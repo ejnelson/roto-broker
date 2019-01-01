@@ -14,10 +14,7 @@ const getAllOptions = async firebase => {
     .database()
     .ref("/allranks")
     .once("value")
-    .then(snapshot => {
-      console.log(snapshot.val());
-      return snapshot.val();
-    });
+    .then(snapshot => snapshot.val());
   return createOptionsFromRanks(ranks);
 };
 
