@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 // import styled from "styled-components";
 
-import { withFirebase } from "../components/FirebaseContext";
-import Layout from "../components/layout";
+import List from "@material-ui/core/List";
 import LeagueSelection from "../containers/LeagueSelection";
+import Layout from "../components/layout";
+import { withFirebase } from "../components/FirebaseContext";
+import IndividualPlayer from "../components/individualPlayer";
 
 class TradesPage extends Component {
   state = {
@@ -43,6 +45,18 @@ class TradesPage extends Component {
       });
   };
 
+  handleSaveOptions = (option, isChecked) => {
+    const newOption = option;
+    newOption.owned = isChecked;
+    const { options } = this.state;
+    const newOptions = options;
+    const pos = newOptions
+      .map(optionFromState => optionFromState.name)
+      .indexOf(newOption.name);
+    newOptions[pos] = newOption;
+    this.userOptionsRef.set(newOptions);
+  };
+
   render() {
     const { options, ranksToCompare } = this.state;
     const cachedRanks = sessionStorage.getItem("ranks");
@@ -64,15 +78,18 @@ class TradesPage extends Component {
         value = pos + 1 - (index + 1);
       }
       return (
-        <li key={option.rank}>
-          {option.name} value: {value}
-        </li>
+        <IndividualPlayer
+          key={option.rank}
+          value={value}
+          option={option}
+          saveOptions={this.handleSaveOptions}
+        />
       );
     });
     return (
       <Layout>
         <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
-        <ul>{listItems}</ul>
+        <List>{listItems}</List>
       </Layout>
     );
   }

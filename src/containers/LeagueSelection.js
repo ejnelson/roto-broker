@@ -41,8 +41,9 @@ class LeagueSelection extends React.Component {
     this.allLeaguesRef = firebase.database().ref(`leagues`);
     this.userLeaguesRef = firebase.database().ref(`users/${uid}/leagues`);
     this.userLeaguesRef.once("value", leagues => {
-      this.setLeague(selectedLeagueFromStateOrCache);
-
+      if (selectedLeagueFromStateOrCache !== "no leagues available") {
+        this.setLeague(selectedLeagueFromStateOrCache);
+      }
       this.setState(prevState => ({
         ...prevState,
         leagues: leagues.val() || []
@@ -70,6 +71,7 @@ class LeagueSelection extends React.Component {
 
   setLeague = league => {
     this.allLeaguesRef.child(`${league}/members`).once("value", members => {
+      console.log(league);
       const keys = Object.keys(members.val());
       const membersArray = [];
       keys.map(key => {
@@ -161,10 +163,10 @@ class LeagueSelection extends React.Component {
         />
         Select Leaguemate to compare ranks:
         {leagueMates.map(data => {
-          let icon = <FacesIcon />;
+          let avatar = <FacesIcon />;
 
           if (data.photoURL != null) {
-            icon = <Avatar alt="photo" src={data.photoURL} />;
+            avatar = <Avatar alt="photo" src={data.photoURL} />;
           }
           let color = "default";
           if (data.uid === selectedMateFromStateOrCache) {
@@ -173,7 +175,7 @@ class LeagueSelection extends React.Component {
           return (
             <Chip
               key={data.uid}
-              icon={icon}
+              avatar={avatar}
               label={data.username}
               clickable
               color={color}
