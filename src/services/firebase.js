@@ -7,7 +7,7 @@ const config = {
   messagingSenderId: "1077190018456"
 };
 
-let firebaseCache;
+// let firebaseCache;
 
 export const getUiConfig = firebase => ({
   signInFlow: "popup",
@@ -18,12 +18,12 @@ export const getUiConfig = firebase => ({
 });
 
 const getFirebase = firebase => {
-  if (firebaseCache) {
-    return firebaseCache;
-  }
+  // if (firebaseCache) {
+  //   return firebaseCache;
+  // }
 
   firebase.initializeApp(config);
-  firebaseCache = firebase;
+  // firebaseCache = firebase;
   return firebase;
 };
 

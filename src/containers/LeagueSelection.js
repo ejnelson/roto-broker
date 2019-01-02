@@ -3,7 +3,7 @@ import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
 import PropTypes from "prop-types";
 
-import TagFacesIcon from "@material-ui/icons/TagFaces";
+import FacesIcon from "@material-ui/icons/Face";
 import Avatar from "@material-ui/core/Avatar";
 
 import SimpleDialog from "../components/SimpleDialog";
@@ -15,13 +15,7 @@ class LeagueSelection extends React.Component {
     selectedLeague: "no leagues available",
     selectedMate: "",
     leagues: ["1"],
-    leagueMates: [
-      { key: 0, label: "Angular" },
-      { key: 1, label: "jQuery" },
-      { key: 2, label: "Polymer" },
-      { key: 3, label: "React" },
-      { key: 4, label: "Vue.js" }
-    ]
+    leagueMates: []
   };
 
   allLeaguesRef = null;
@@ -31,11 +25,24 @@ class LeagueSelection extends React.Component {
   componentWillMount() {
     const { firebase } = this.props;
     const { uid } = firebase.auth().currentUser;
+    const { selectedLeague } = this.state;
+    const cachedLeague = sessionStorage.getItem("league");
+
+    let selectedLeagueFromStateOrCache;
+    if (cachedLeague) {
+      console.log(`l cached${JSON.parse(cachedLeague)}`);
+
+      selectedLeagueFromStateOrCache = JSON.parse(cachedLeague);
+    } else {
+      selectedLeagueFromStateOrCache = selectedLeague;
+    }
+
     console.log(uid);
     this.allLeaguesRef = firebase.database().ref(`leagues`);
     this.userLeaguesRef = firebase.database().ref(`users/${uid}/leagues`);
     this.userLeaguesRef.once("value", leagues => {
-      this.setLeague(leagues.val()[0]);
+      this.setLeague(selectedLeagueFromStateOrCache);
+
       this.setState(prevState => ({
         ...prevState,
         leagues: leagues.val() || []
@@ -50,13 +57,14 @@ class LeagueSelection extends React.Component {
     }));
   };
 
-  handleClickLeagueMate = mate => {
+  handleClickLeagueMate = mateUid => {
     const { setRanksToCompare } = this.props;
-    console.log(mate);
-    setRanksToCompare(mate);
+    setRanksToCompare(mateUid);
+    sessionStorage.setItem("selectedMate", JSON.stringify(mateUid));
+
     this.setState(prevState => ({
       ...prevState,
-      selectedMate: mate
+      selectedMate: mateUid
     }));
   };
 
@@ -70,6 +78,8 @@ class LeagueSelection extends React.Component {
         membersArray.push(member);
         return null;
       });
+      sessionStorage.setItem("league", JSON.stringify(league));
+
       this.setState(prevState => ({
         ...prevState,
         selectedLeague: league,
@@ -124,7 +134,20 @@ class LeagueSelection extends React.Component {
   };
 
   render() {
-    const { leagues, selectedLeague, open, leagueMates } = this.state;
+    const {
+      leagues,
+      selectedLeague,
+      open,
+      leagueMates,
+      selectedMate
+    } = this.state;
+    const cachedSelectedMate = sessionStorage.getItem("selectedMate");
+    let selectedMateFromStateOrCache;
+    if (cachedSelectedMate) {
+      selectedMateFromStateOrCache = JSON.parse(cachedSelectedMate);
+    } else {
+      selectedMateFromStateOrCache = selectedMate;
+    }
     return (
       <div>
         <Button onClick={this.handleClickOpen}>League: {selectedLeague}</Button>
@@ -138,16 +161,22 @@ class LeagueSelection extends React.Component {
         />
         Select Leaguemate to compare ranks:
         {leagueMates.map(data => {
-          let avatar = <TagFacesIcon />;
+          let icon = <FacesIcon />;
 
           if (data.photoURL != null) {
-            avatar = <Avatar alt="photo" src={data.photoURL} />;
+            icon = <Avatar alt="photo" src={data.photoURL} />;
+          }
+          let color = "default";
+          if (data.uid === selectedMateFromStateOrCache) {
+            color = "primary";
           }
           return (
             <Chip
               key={data.uid}
-              avatar={avatar}
+              icon={icon}
               label={data.username}
+              clickable
+              color={color}
               onClick={() => this.handleClickLeagueMate(data.uid)}
             />
           );

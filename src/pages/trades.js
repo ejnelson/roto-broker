@@ -25,25 +25,50 @@ class TradesPage extends Component {
     });
   }
 
-  setRanksToCompare = leagueMate => {
+  setRanksToCompare = leagueMateUid => {
     const { firebase } = this.props;
 
     firebase
       .database()
-      .ref(`users/${leagueMate}/ranks`)
+      .ref(`users/${leagueMateUid}/ranks`)
       .once("value", ranks => {
-        this.setState(prevState => ({
-          ...prevState,
-          ranksToCompare: ranks.val() || [{ name: "no ranks to compare" }]
-        }));
+        this.setState(prevState => {
+          sessionStorage.setItem("ranks", JSON.stringify(ranks.val()));
+
+          return {
+            ...prevState,
+            ranksToCompare: ranks.val() || [{ name: "no ranks to compare" }]
+          };
+        });
       });
   };
 
   render() {
-    const { options } = this.state;
-    const listItems = options.map(option => (
-      <li key={option.name}>{option.name}</li>
-    ));
+    const { options, ranksToCompare } = this.state;
+    const cachedRanks = sessionStorage.getItem("ranks");
+    let ranksFromStateOrCache;
+    if (cachedRanks) {
+      ranksFromStateOrCache = JSON.parse(cachedRanks);
+    } else {
+      ranksFromStateOrCache = ranksToCompare;
+    }
+
+    const listItems = options.map((option, index) => {
+      const pos = ranksFromStateOrCache
+        .map(comparator => comparator.name)
+        .indexOf(option.name);
+      let value;
+      if (pos === -1) {
+        value = "n/a";
+      } else {
+        value = pos + 1 - (index + 1);
+      }
+      return (
+        <li key={option.rank}>
+          {option.name} value: {value}
+        </li>
+      );
+    });
     return (
       <Layout>
         <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
