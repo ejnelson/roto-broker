@@ -1,20 +1,15 @@
 import React, { Component } from "react";
 // import styled from "styled-components";
 
-import List from "@material-ui/core/List";
 import { withStyles } from "@material-ui/core/styles";
 import blue from "@material-ui/core/colors/blue";
 import Grid from "@material-ui/core/Grid";
 import LeagueSelection from "../containers/LeagueSelection";
 import Layout from "../components/layout";
 import { withFirebase } from "../components/FirebaseContext";
-import IndividualPlayer from "../components/individualPlayer";
+import TradesPageList from "../components/TradesPageList";
 
 const styles = {
-  optionsList: {
-    // backgroundColor: blue[100],
-    color: blue[600]
-  },
   optionsHeaders: {
     backgroundColor: blue[300],
     color: blue[800]
@@ -40,6 +35,18 @@ class TradesPage extends Component {
     });
   }
 
+  handleSaveOptions = (option, isChecked) => {
+    const newOption = option;
+    newOption.owned = isChecked;
+    const { options } = this.state;
+    const newOptions = options;
+    const pos = newOptions
+      .map(optionFromState => optionFromState.name)
+      .indexOf(newOption.name);
+    newOptions[pos] = newOption;
+    this.userOptionsRef.set(newOptions);
+  };
+
   setRanksToCompare = leagueMateUid => {
     const { firebase } = this.props;
 
@@ -58,59 +65,32 @@ class TradesPage extends Component {
       });
   };
 
-  handleSaveOptions = (option, isChecked) => {
-    const newOption = option;
-    newOption.owned = isChecked;
-    const { options } = this.state;
-    const newOptions = options;
-    const pos = newOptions
-      .map(optionFromState => optionFromState.name)
-      .indexOf(newOption.name);
-    newOptions[pos] = newOption;
-    this.userOptionsRef.set(newOptions);
-  };
-
   render() {
     const { options, ranksToCompare } = this.state;
     const { classes } = this.props;
     const cachedRanks = sessionStorage.getItem("ranks");
-    let ranksFromStateOrCache;
+    let ranksToCompareFromStateOrCache;
     if (cachedRanks) {
-      ranksFromStateOrCache = JSON.parse(cachedRanks);
+      ranksToCompareFromStateOrCache = JSON.parse(cachedRanks);
     } else {
-      ranksFromStateOrCache = ranksToCompare;
+      ranksToCompareFromStateOrCache = ranksToCompare;
     }
 
-    const listItems = options.map((option, index) => {
-      const pos = ranksFromStateOrCache
-        .map(comparator => comparator.name)
-        .indexOf(option.name);
-      let value;
-      if (pos === -1) {
-        value = "n/a";
-      } else {
-        value = pos + 1 - (index + 1);
-      }
-      return (
-        <IndividualPlayer
-          key={option.rank}
-          value={value}
-          option={option}
-          saveOptions={this.handleSaveOptions}
-        />
-      );
-    });
     return (
       <Layout>
         <Grid container>
-          <Grid item>
+          <Grid item xs={12}>
             <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
           </Grid>
           <Grid item>
             <Grid item>
-              <List className={classes.optionsHeaders}>headers</List>
+              <div className={classes.optionsHeaders}>headers</div>
             </Grid>
-            <List className={classes.optionsList}>{listItems}</List>
+            <TradesPageList
+              options={options}
+              ranksToCompare={ranksToCompareFromStateOrCache}
+              handleSaveOptions={this.handleSaveOptions}
+            />
           </Grid>
         </Grid>
       </Layout>

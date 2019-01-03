@@ -7,7 +7,7 @@ import SignIn from "../containers/SignIn";
 class AuthLayout extends Component {
   state = {
     firebase: null,
-    authenticated: false,
+    authenticated: false
   };
 
   componentDidMount() {
@@ -31,12 +31,12 @@ class AuthLayout extends Component {
 
   render = () => {
     const { firebase, authenticated } = this.state;
-
+    const { children } = this.props;
     if (!firebase) return null;
 
     return (
       <FirebaseContext.Provider value={firebase}>
-        {authenticated ? this.props.children : <SignIn />}
+        {authenticated ? children : <SignIn />}
       </FirebaseContext.Provider>
     );
   };
