@@ -2,11 +2,24 @@ import React, { Component } from "react";
 // import styled from "styled-components";
 
 import List from "@material-ui/core/List";
+import { withStyles } from "@material-ui/core/styles";
+import blue from "@material-ui/core/colors/blue";
+import Grid from "@material-ui/core/Grid";
 import LeagueSelection from "../containers/LeagueSelection";
 import Layout from "../components/layout";
 import { withFirebase } from "../components/FirebaseContext";
 import IndividualPlayer from "../components/individualPlayer";
 
+const styles = {
+  optionsList: {
+    // backgroundColor: blue[100],
+    color: blue[600]
+  },
+  optionsHeaders: {
+    backgroundColor: blue[300],
+    color: blue[800]
+  }
+};
 class TradesPage extends Component {
   state = {
     options: [],
@@ -59,6 +72,7 @@ class TradesPage extends Component {
 
   render() {
     const { options, ranksToCompare } = this.state;
+    const { classes } = this.props;
     const cachedRanks = sessionStorage.getItem("ranks");
     let ranksFromStateOrCache;
     if (cachedRanks) {
@@ -88,11 +102,20 @@ class TradesPage extends Component {
     });
     return (
       <Layout>
-        <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
-        <List>{listItems}</List>
+        <Grid container>
+          <Grid item>
+            <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
+          </Grid>
+          <Grid item>
+            <Grid item>
+              <List className={classes.optionsHeaders}>headers</List>
+            </Grid>
+            <List className={classes.optionsList}>{listItems}</List>
+          </Grid>
+        </Grid>
       </Layout>
     );
   }
 }
 
-export default withFirebase(TradesPage);
+export default withFirebase(withStyles(styles)(TradesPage));

@@ -5,10 +5,18 @@ import PropTypes from "prop-types";
 
 import FacesIcon from "@material-ui/icons/Face";
 import Avatar from "@material-ui/core/Avatar";
+import blue from "@material-ui/core/colors/blue";
 
+import { withStyles } from "@material-ui/core/styles";
 import SimpleDialog from "../components/SimpleDialog";
 import { withFirebase } from "../components/FirebaseContext";
 
+const styles = {
+  leagueSelection: {
+    backgroundColor: blue[100],
+    color: blue[600]
+  }
+};
 class LeagueSelection extends React.Component {
   state = {
     open: false,
@@ -143,6 +151,7 @@ class LeagueSelection extends React.Component {
       leagueMates,
       selectedMate
     } = this.state;
+    const { classes } = this.props;
     const cachedSelectedMate = sessionStorage.getItem("selectedMate");
     let selectedMateFromStateOrCache;
     if (cachedSelectedMate) {
@@ -151,7 +160,7 @@ class LeagueSelection extends React.Component {
       selectedMateFromStateOrCache = selectedMate;
     }
     return (
-      <div>
+      <div className={classes.leagueSelection}>
         <Button onClick={this.handleClickOpen}>League: {selectedLeague}</Button>
         <SimpleDialog
           selectedLeague={selectedLeague}
@@ -190,4 +199,4 @@ class LeagueSelection extends React.Component {
 LeagueSelection.propTypes = {
   setRanksToCompare: PropTypes.func.isRequired
 };
-export default withFirebase(LeagueSelection);
+export default withFirebase(withStyles(styles)(LeagueSelection));
