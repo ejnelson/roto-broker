@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "gatsby";
 import SignOut from "../containers/SignOut";
+import logo from "../images/roto-broker.png";
 
 const Header = ({ siteTitle }) => (
   <div
     style={{
-      background: "#ffa400",
+      background: "#bbb",
       marginBottom: "1.45rem"
     }}
   >
@@ -16,9 +17,9 @@ const Header = ({ siteTitle }) => (
         padding: "1.45rem 1.0875rem"
       }}
     >
-      <h1 style={{ margin: 0 }}>
-        <Link to="/">{siteTitle}</Link>
-      </h1>
+      <Link to="/">
+        <img src={logo} alt={siteTitle} />
+      </Link>
       <Link
         to="/ranks"
         style={{
