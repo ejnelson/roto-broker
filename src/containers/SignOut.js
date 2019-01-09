@@ -3,11 +3,14 @@ import { withFirebase } from "../components/FirebaseContext";
 
 class Signout extends Component {
   signOut = () => {
-    this.props.firebase.auth().signOut();
+    const { firebase } = this.props;
+    firebase.auth().signOut();
   };
+
   render() {
     return (
       <button
+        type="button"
         style={{
           marginLeft: 10,
           borderRadius: "0.5rem",
