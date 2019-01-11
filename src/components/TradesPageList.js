@@ -1,3 +1,5 @@
+/* eslint react/destructuring-assignment: 0 */
+
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -54,8 +56,8 @@ class TradesPageList extends React.Component {
 }
 
 TradesPageList.propTypes = {
-  //   value: PropTypes.number.isRequired,
-  //   ranksToCompare: PropTypes.func.isRequired
+  handleSaveOptions: PropTypes.func.isRequired,
+  ranksToCompare: PropTypes.func.isRequired
   //   options: PropTypes.instanceOf(PropTypes.Array).isRequired
 };
 

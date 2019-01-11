@@ -1,3 +1,5 @@
+/* eslint react/destructuring-assignment: 0 */
+
 // ./src/components/NewPoll/index.js
 import React from "react";
 import styled from "styled-components";
@@ -37,14 +39,6 @@ const DragHandle = SortableHandle(() => <ActionItem>:::</ActionItem>);
 const SortableItem = SortableElement(({ name, rank, team, position, id }) => (
   <OptionItemContainer key={id}>
     {name}, {rank}, {team}, {position}
-    {/* <ActionItem
-        editing
-        onClick={() => onDelete(id)}
-        right={40}
-        title="Delete"
-      >
-        x
-      </ActionItem> */}
     <DragHandle />
   </OptionItemContainer>
 ));
@@ -56,10 +50,42 @@ const SortableList = SortableContainer(({ options, ...props }) => (
     ))}
   </OptionsContainer>
 ));
+class DraggableList extends React.Component {
+  state = {
+    options: this.props.options.slice(0, 1)
+  };
 
-const DraggableList = props => (
-  <SortableList {...props} lockAxis="y" useDragHandle lockToContainerEdges />
-);
+  componentDidMount() {
+    this.recursive();
+  }
+
+  componentWillReceiveProps() {
+    this.recursive();
+  }
+
+  recursive = () => {
+    setTimeout(() => {
+      const hasMore = this.state.options.length + 1 < this.props.options.length;
+      this.setState((prev, props) => ({
+        options: props.options.slice(0, prev.options.length + 1)
+      }));
+      if (hasMore) this.recursive();
+    }, 0);
+  };
+
+  render() {
+    const { options } = this.state;
+    return (
+      <SortableList
+        {...this.props}
+        options={options}
+        lockAxis="y"
+        useDragHandle
+        lockToContainerEdges
+      />
+    );
+  }
+}
 
 DraggableList.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,

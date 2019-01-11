@@ -2,7 +2,11 @@ const path = require(`path`);
 
 module.exports = {
   siteMetadata: {
-    title: "Roto-Broker"
+    title: "Roto-Broker",
+    description:
+      "Making it easy to get fantasy football trades done with your league mates!",
+    url: "https://www.roto-broker.com", // No trailing slash allowed!
+    twitterUsername: "@ejnelson"
   },
   plugins: [
     "gatsby-plugin-react-helmet",
