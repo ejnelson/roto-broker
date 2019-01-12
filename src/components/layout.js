@@ -1,19 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Helmet } from "react-helmet";
 import { StaticQuery, graphql } from "gatsby";
 
 import Header from "./header";
 import "./layout.css";
 
 const query = graphql`
-  query SEO {
+  query site {
     site {
       siteMetadata {
         defaultTitle: title
         defaultDescription: description
         siteUrl: url
-        twitterUsername
       }
     }
   }
@@ -24,15 +22,7 @@ const Layout = ({ children }) => (
     query={query}
     render={data => (
       <>
-        <Helmet>
-          <title>{data.site.siteMetadata.defaultTitle}</title>
-          <meta
-            name="description"
-            content={data.site.siteMetadata.defaultDescription}
-          />
-          <meta property="og:url" content={data.site.siteMetadata.url} />
-        </Helmet>
-        <Header siteTitle={data.site.siteMetadata.title} />
+        <Header siteTitle={data.site.siteMetadata.defaultTitle} />
         <div
           style={{
             margin: "0 auto",

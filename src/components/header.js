@@ -3,6 +3,7 @@ import { Link } from "gatsby";
 import styled from "styled-components";
 import SignOut from "../containers/SignOut";
 import logo from "../images/roto-broker.png";
+import SEO from "./seo";
 
 const Logo = styled.img`
   height: 2.5rem;
@@ -15,6 +16,7 @@ const HeaderBar = styled.div`
 
 const Header = ({ siteTitle }) => (
   <HeaderBar>
+    <SEO title="Home" keywords={[`fantasy football`, `roto`, `trade`]} />
     <Link to="/">
       <Logo src={logo} alt={siteTitle} />
     </Link>

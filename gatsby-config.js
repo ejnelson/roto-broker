@@ -6,7 +6,7 @@ module.exports = {
     description:
       "Making it easy to get fantasy football trades done with your league mates!",
     url: "https://www.roto-broker.com", // No trailing slash allowed!
-    twitterUsername: "@ejnelson"
+    author: "@ejnelson"
   },
   plugins: [
     "gatsby-plugin-react-helmet",
@@ -40,7 +40,7 @@ module.exports = {
         icon: "src/images/rotobrokericon.png" // This path is relative to the root of the site.
       }
     },
-    "gatsby-plugin-layout"
-    // 'gatsby-plugin-offline',
+    "gatsby-plugin-layout",
+    "gatsby-plugin-offline"
   ]
 };
