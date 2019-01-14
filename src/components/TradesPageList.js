@@ -19,8 +19,12 @@ class TradesPageList extends React.Component {
     this.recursive();
   }
 
+  componentWillUnmount() {
+    clearInterval(this.timeout);
+  }
+
   recursive = () => {
-    setTimeout(() => {
+    this.timeout = setTimeout(() => {
       const hasMore = this.state.options.length + 1 < this.props.options.length;
       this.setState((prev, props) => ({
         options: props.options.slice(0, prev.options.length + 1)
@@ -57,7 +61,7 @@ class TradesPageList extends React.Component {
 
 TradesPageList.propTypes = {
   handleSaveOptions: PropTypes.func.isRequired,
-  ranksToCompare: PropTypes.func.isRequired
+  ranksToCompare: PropTypes.arrayOf(PropTypes.string).isRequired
   //   options: PropTypes.instanceOf(PropTypes.Array).isRequired
 };
 

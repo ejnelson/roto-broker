@@ -1,5 +1,4 @@
 import React from "react";
-import "typeface-roboto";
 
 import styled from "styled-components";
 import Layout from "../components/layout";
