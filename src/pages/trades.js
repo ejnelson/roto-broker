@@ -75,9 +75,8 @@ class TradesPage extends Component {
     } else {
       ranksToCompareFromStateOrCache = ranksToCompare;
     }
-
     return (
-      <Layout>
+      <Layout gradientColor="#8c52ff">
         <Grid container>
           <Grid item xs={12}>
             <LeagueSelection setRanksToCompare={this.setRanksToCompare} />

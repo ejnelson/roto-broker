@@ -11,7 +11,10 @@ class TradesPageList extends React.Component {
     options: this.props.options.slice(0, 1)
   };
 
+  isThisMounted = false;
+
   componentDidMount() {
+    this.isThisMounted = true;
     this.recursive();
   }
 
@@ -20,17 +23,21 @@ class TradesPageList extends React.Component {
   }
 
   componentWillUnmount() {
+    this.isThisMounted = false;
     clearInterval(this.timeout);
   }
 
   recursive = () => {
-    this.timeout = setTimeout(() => {
-      const hasMore = this.state.options.length + 1 < this.props.options.length;
-      this.setState((prev, props) => ({
-        options: props.options.slice(0, prev.options.length + 1)
-      }));
-      if (hasMore) this.recursive();
-    }, 0);
+    if (this.isThisMounted) {
+      this.timeout = setTimeout(() => {
+        const hasMore =
+          this.state.options.length + 1 < this.props.options.length;
+        this.setState((prev, props) => ({
+          options: props.options.slice(0, prev.options.length + 1)
+        }));
+        if (hasMore) this.recursive();
+      }, 0);
+    }
   };
 
   render() {

@@ -29,7 +29,8 @@ const OptionItemContainer = styled.li`
 const ActionItem = styled.div`
   position: absolute;
   right: ${props => (props.right ? `${props.right}px` : "10px")};
-  top: 50%;
+  top: 40%;
+  font-size: 40px;
   transform: translateY(-50%);
   cursor: ${props => (props.editing ? "pointer" : "move")};
 `;
@@ -69,13 +70,11 @@ class DraggableList extends React.Component {
   componentWillUnmount() {
     this.isThisMounted = false;
     clearTimeout(this.timeout);
-    console.log("cleared");
   }
 
   recursive = () => {
     if (this.isThisMounted) {
       this.timeout = setTimeout(() => {
-        console.log("working....");
         const hasMore =
           this.state.options.length + 1 < this.props.options.length;
         this.setState((prev, props) => ({
