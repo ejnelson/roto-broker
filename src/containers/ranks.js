@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import styled from "styled-components";
-import { arrayMove } from "react-sortable-hoc";
+// import { arrayMove } from "react-sortable-hoc";
 
 import { withFirebase } from "../components/FirebaseContext";
 import Layout from "../components/layout";

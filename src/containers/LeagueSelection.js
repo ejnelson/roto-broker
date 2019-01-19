@@ -38,14 +38,11 @@ class LeagueSelection extends React.Component {
 
     let selectedLeagueFromStateOrCache;
     if (cachedLeague) {
-      console.log(`l cached${JSON.parse(cachedLeague)}`);
-
       selectedLeagueFromStateOrCache = JSON.parse(cachedLeague);
     } else {
       selectedLeagueFromStateOrCache = selectedLeague;
     }
 
-    console.log(uid);
     this.allLeaguesRef = firebase.database().ref(`leagues`);
     this.userLeaguesRef = firebase.database().ref(`users/${uid}/leagues`);
     this.userLeaguesRef.once("value", leagues => {
@@ -79,7 +76,6 @@ class LeagueSelection extends React.Component {
 
   setLeague = league => {
     this.allLeaguesRef.child(`${league}/members`).once("value", members => {
-      console.log(league);
       const keys = Object.keys(members.val());
       const membersArray = [];
       keys.map(key => {

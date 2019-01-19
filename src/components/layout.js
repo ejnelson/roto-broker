@@ -1,13 +1,9 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import React, { Component } from "react";
+import React from "react";
 
 import Header from "./header";
 import "./layout.css";
-
-import getFirebase from "../services/firebase";
-import FirebaseContext from "./FirebaseContext";
-import SignIn from "../containers/SignIn";
 
 const Background = styled.div`
   background: white;
@@ -24,49 +20,17 @@ const Container = styled.div`
   padding: 0px 1.0875rem 1.45rem;
 `;
 
-class AuthLayout extends Component {
-  state = {
-    firebase: null,
-    authenticated: false
-  };
+const Layout = ({ children, gradientColor }) => (
+  <>
+    <Header />
+    <Background gradientColor={gradientColor}>
+      <Container>{children}</Container>
+    </Background>
+  </>
+);
 
-  componentDidMount() {
-    const app = import("firebase/app");
-    const auth = import("firebase/auth");
-    const database = import("firebase/database");
+export default Layout;
 
-    Promise.all([app, auth, database]).then(values => {
-      const firebase = getFirebase(values[0]);
-      this.setState({ firebase });
-
-      firebase.auth().onAuthStateChanged(user => {
-        if (!user) {
-          this.setState({ authenticated: false });
-        } else {
-          this.setState({ authenticated: true });
-        }
-      });
-    });
-  }
-
-  render = () => {
-    const { firebase, authenticated } = this.state;
-    const { children, gradientColor } = this.props;
-    if (!firebase) return null;
-
-    return (
-      <FirebaseContext.Provider value={firebase}>
-        <Header />
-        <Background gradientColor={gradientColor}>
-          <Container>{authenticated ? children : <SignIn />}</Container>
-        </Background>
-      </FirebaseContext.Provider>
-    );
-  };
-}
-
-export default AuthLayout;
-
-AuthLayout.propTypes = {
+Layout.propTypes = {
   children: PropTypes.node.isRequired
 };

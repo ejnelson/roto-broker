@@ -1,10 +1,8 @@
 import React from "react";
 import { navigate, Link } from "gatsby";
 import styled from "styled-components";
-import Button from "@material-ui/core/Button";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
+// import FormControlLabel from "@material-ui/core/FormControlLabel";
+// import Switch from "@material-ui/core/Switch";
 import UserMenu from "./UserMenu";
 import logo from "../images/roto-broker.png";
 import SEO from "./seo";
@@ -22,9 +20,9 @@ const HeaderBar = styled.div`
   align-items: center;
 `;
 class Header extends React.Component {
-  state = {
-    checked: true
-  };
+  // state = {
+  //   checked: false
+  // };
 
   handleChange = name => event => {
     this.setState({ [name]: event.target.checked });
@@ -39,7 +37,6 @@ class Header extends React.Component {
 
   render() {
     const { siteTitle, firebase } = this.props;
-    const { checked } = this.state;
     return (
       <HeaderBar>
         <SEO
@@ -49,18 +46,6 @@ class Header extends React.Component {
         <Link to="/">
           <Logo src={logo} alt={siteTitle} />
         </Link>
-        {firebase.auth().currentUser ? (
-          <FormControlLabel
-            control={
-              <Switch
-                checked={checked}
-                onChange={this.handleChange("checked")}
-                value="checked"
-              />
-            }
-            label="Primary"
-          />
-        ) : null}
         {firebase.auth().currentUser ? <UserMenu /> : null}
       </HeaderBar>
     );

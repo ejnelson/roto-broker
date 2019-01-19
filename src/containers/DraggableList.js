@@ -4,11 +4,8 @@
 import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import {
-  SortableContainer,
-  SortableElement,
-  SortableHandle
-} from "react-sortable-hoc";
+// import { SortableContainer } from "react-sortable-hoc";
+import SortableItem from "../components/SortableItem";
 
 const OptionsContainer = styled.ul`
   list-style: none;
@@ -16,41 +13,22 @@ const OptionsContainer = styled.ul`
   margin: 0 0 30px;
 `;
 
-const OptionItemContainer = styled.li`
-  border-bottom: 1px solid #ddd;
-  padding: 10px 60px 10px 20px;
-  margin: 0 0 10px;
-  background-color: #f5f5f5;
-  list-style: none;
-  position: relative;
-  min-height: 36px;
-`;
+const SortableList = SortableContainer(
+  ({ options, ranksToCompare, ...props }) => (
+    <OptionsContainer>
+      {options.filter(Boolean).map((option, index) => (
+        <SortableItem
+          option={option}
+          value={1}
+          {...props}
+          index={index}
+          key={option.id}
+        />
+      ))}
+    </OptionsContainer>
+  )
+);
 
-const ActionItem = styled.div`
-  position: absolute;
-  right: ${props => (props.right ? `${props.right}px` : "10px")};
-  top: 40%;
-  font-size: 40px;
-  transform: translateY(-50%);
-  cursor: ${props => (props.editing ? "pointer" : "move")};
-`;
-
-const DragHandle = SortableHandle(() => <ActionItem>:::</ActionItem>);
-
-const SortableItem = SortableElement(({ name, rank, team, position, id }) => (
-  <OptionItemContainer key={id}>
-    {name}, {rank}, {team}, {position}
-    <DragHandle />
-  </OptionItemContainer>
-));
-
-const SortableList = SortableContainer(({ options, ...props }) => (
-  <OptionsContainer>
-    {options.filter(Boolean).map((option, index) => (
-      <SortableItem {...option} {...props} index={index} key={option.id} />
-    ))}
-  </OptionsContainer>
-));
 class DraggableList extends React.Component {
   state = {
     options: this.props.options.slice(0, 1)
@@ -86,7 +64,9 @@ class DraggableList extends React.Component {
   };
 
   render() {
+    const { ranksToCompare, handleSaveOptions } = this.props;
     const { options } = this.state;
+
     return (
       <SortableList
         {...this.props}
@@ -94,14 +74,18 @@ class DraggableList extends React.Component {
         lockAxis="y"
         useDragHandle
         lockToContainerEdges
+        ranksToCompare={ranksToCompare}
+        saveOptions={handleSaveOptions}
       />
     );
   }
 }
 
 DraggableList.propTypes = {
+  handleSaveOptions: PropTypes.func.isRequired,
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onSortEnd: PropTypes.func.isRequired
+  onSortEnd: PropTypes.func.isRequired,
+  ranksToCompare: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
 export default DraggableList;

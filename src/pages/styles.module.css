@@ -5,3 +5,35 @@
 .reallyCool {
   border: 10px solid yellow;
 }
+
+.box {
+  width: 100px;
+  height: 100px;
+  background: #ff1c68;
+  transform-origin: 50% 50%;
+}
+
+.backgroundBlack {
+  background: red;
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 0px 1.0875rem 1.45rem;
+}
+
+.backgroundOutside {
+  --color: #ff1c68;
+}
+.backgroundInside {
+  background: var(--color);
+  background-attachment: fixed;
+  height: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: -1;
+  transform-origin: 50% 50%;
+}
