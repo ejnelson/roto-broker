@@ -36,7 +36,7 @@ class Header extends React.Component {
   };
 
   render() {
-    const { siteTitle, firebase } = this.props;
+    const { siteTitle, firebase, changeIsRanks } = this.props;
     return (
       <HeaderBar>
         <SEO
@@ -46,6 +46,11 @@ class Header extends React.Component {
         <Link to="/">
           <Logo src={logo} alt={siteTitle} />
         </Link>
+        {firebase.auth().currentUser ? (
+          <button type="button" onClick={() => changeIsRanks()}>
+            change ranks/trades
+          </button>
+        ) : null}
         {firebase.auth().currentUser ? <UserMenu /> : null}
       </HeaderBar>
     );

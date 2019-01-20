@@ -1,6 +1,7 @@
 import React from "react";
 import posed from "react-pose";
 import styled from "styled-components";
+import Checkbox from "@material-ui/core/Checkbox";
 
 const Player = posed.div({
   ranks: {
@@ -25,21 +26,73 @@ const StyledPlayer = styled(Player)`
 
   left: -50%;
 `;
+const StyledCheckbox = styled(Checkbox)`
+  /* align-self: flex-start; */
+`;
 
-const PlayerContainer = props => {
-  const { option, iRef, dProps, dHProps, style, ranksOrTrades } = props;
-  return (
-    <StyledPlayer
-      {...dProps}
-      {...dHProps}
-      ref={iRef}
-      style={style}
-      pose={ranksOrTrades}
-    >
-      {option.name}
-    </StyledPlayer>
-  );
-};
+class PlayerContainer extends React.Component {
+  state = {
+    owned: false
+  };
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.option.owned !== prevState.owned) {
+      return { owned: nextProps.option.owned };
+    }
+    return null;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { owned } = this.state;
+    const { compareValue, option, dProps } = this.props;
+    if (
+      compareValue === nextProps.compareValue &&
+      option.owned === owned &&
+      nextState.owned === owned &&
+      dProps === nextProps.dProps
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  handleChange = name => event => {
+    const isChecked = event.target.checked;
+    const { saveOptions, option } = this.props;
+    this.setState({ [name]: isChecked });
+    saveOptions(option, isChecked);
+  };
+
+  render() {
+    const { owned } = this.state;
+
+    const {
+      option,
+      iRef,
+      dProps,
+      dHProps,
+      style,
+      ranksOrTrades,
+      compareValue
+    } = this.props;
+    return (
+      <StyledPlayer
+        {...dProps}
+        {...dHProps}
+        ref={iRef}
+        style={style}
+        pose={ranksOrTrades}
+      >
+        <StyledCheckbox
+          checked={owned || false}
+          onChange={this.handleChange("owned")}
+          value={option.name}
+        />
+        {option.name}, {option.rank}, {option.position}, {compareValue}
+      </StyledPlayer>
+    );
+  }
+}
 
 export default PlayerContainer;
 

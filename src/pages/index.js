@@ -8,6 +8,7 @@ import styled from "styled-components";
 import Header from "../components/header";
 import Background from "../containers/Background";
 import LayoutContainer from "../containers/LayoutContainer";
+import LeagueSelection from "../containers/LeagueSelection";
 
 import { withFirebase } from "../components/FirebaseContext";
 import getAllOptions from "../services/getRanks";
@@ -26,23 +27,22 @@ const grid = 8;
 const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? "lightblue" : "lightgrey",
   padding: grid,
+  overflow: "auto",
   width: 250
 });
 
 const ListContainer = posed.div({
   ranks: {
-    opacity: 0.5,
-    width: 100,
+    width: 1000,
 
     transition: {
-      default: { ease: "easeInOut", duration: 1000 }
+      default: { ease: "easeInOut", duration: 200 }
     }
   },
   trades: {
-    opacity: 1,
-    width: 200,
+    width: 400,
     transition: {
-      default: { ease: "easeInOut", duration: 1000 }
+      default: { ease: "easeInOut", duration: 200 }
     }
   }
 });
@@ -52,100 +52,57 @@ const StyledListContainer = styled(ListContainer)`
 `;
 
 class Main extends React.Component {
-  state = { isVisible: true, options: [{ id: 1 }], ranksToCompare: [{}] };
+  state = { isRanks: true, options: [{ id: 1 }], ranksToCompare: [{}] };
 
   optionsRef = null;
 
-  fullOptions = Array.from({ length: 100 }, (v, k) => k).map(k => ({
-    id: `item-${k}`,
-    name: `item ${k}`
-  }));
-
-  isThisMounted = false;
-
-  // constructor(props) {
-  //   super(props);
-  // const { firebase } = props;
-  // const { displayName, email, photoURL, uid } = firebase.auth().currentUser;
-  // this.optionsRef = firebase.database().ref(`users/${uid}/ranks`);
-  // this.optionsRef.once("value", options => {
-  //   if (options.val() == null) {
-  //     this.writeUserData(uid, displayName, email, photoURL);
-  //     this.resetRanks();
-  //   } else {
-  //     this.fullOptions = options.val();
-  //     this.setState(prevState => ({
-  //       ...prevState,
-  //       options: options.val().slice(0, 1)
-  //     }));
-  //   }
-  // });
-
-  // }
-
-  componentDidMount() {
-    this.isThisMounted = true;
-    this.recursive();
-    setInterval(() => {
-      console.log("changing list");
-      this.setState(prevState => ({
-        ...prevState,
-        isVisible: !prevState.isVisible
-      }));
-    }, 3000);
-  }
-
-  componentWillReceiveProps() {
-    this.recursive();
-  }
-
-  componentWillUnmount() {
-    this.isThisMounted = false;
-    clearInterval(this.timeout);
-  }
-
-  recursive = () => {
-    if (this.isThisMounted) {
-      this.timeout = setTimeout(() => {
-        const { options } = this.state;
-        const hasMore = options.length + 1 < this.fullOptions.length;
+  constructor(props) {
+    super(props);
+    const { firebase } = props;
+    const { displayName, email, photoURL, uid } = firebase.auth().currentUser;
+    this.optionsRef = firebase.database().ref(`users/${uid}/ranks`);
+    this.optionsRef.once("value", options => {
+      if (options.val() == null) {
+        this.writeUserData(uid, displayName, email, photoURL);
+        this.resetRanks();
+      } else {
         this.setState(prevState => ({
-          options: this.fullOptions.slice(0, prevState.options.length + 1)
+          ...prevState,
+          options: options.val()
         }));
-        if (hasMore) this.recursive();
-      }, 0);
-    }
+      }
+    });
+  }
+
+  handleSaveOptions = (option, isChecked) => {
+    const newOption = option;
+    newOption.owned = isChecked;
+    const { options } = this.state;
+    const newOptions = options;
+    const pos = newOptions
+      .map(optionFromState => optionFromState.name)
+      .indexOf(newOption.name);
+    newOptions[pos] = newOption;
+    this.optionsRef.set(newOptions);
   };
 
-  // handleSaveOptions = (option, isChecked) => {
-  //   const newOption = option;
-  //   newOption.owned = isChecked;
-  //   const { options } = this.state;
-  //   const newOptions = options;
-  //   const pos = newOptions
-  //     .map(optionFromState => optionFromState.name)
-  //     .indexOf(newOption.name);
-  //   newOptions[pos] = newOption;
-  //   this.optionsRef.set(newOptions);
-  // };
+  setRanksToCompare = leagueMateUid => {
+    const { firebase } = this.props;
 
-  // setRanksToCompare = leagueMateUid => {
-  //   const { firebase } = this.props;
+    firebase
+      .database()
+      .ref(`users/${leagueMateUid}/ranks`)
+      .once("value", ranks => {
+        this.setState(prevState => {
+          sessionStorage.setItem("ranks", JSON.stringify(ranks.val()));
 
-  //   firebase
-  //     .database()
-  //     .ref(`users/${leagueMateUid}/ranks`)
-  //     .once("value", ranks => {
-  //       this.setState(prevState => {
-  //         sessionStorage.setItem("ranks", JSON.stringify(ranks.val()));
-
-  //         return {
-  //           ...prevState,
-  //           ranksToCompare: ranks.val() || [{ name: "no ranks to compare" }]
-  //         };
-  //       });
-  //     });
-  // };
+          return {
+            ...prevState,
+            ranksToCompare: ranks.val() || [{ name: "no ranks to compare" }]
+          };
+        });
+      });
+  };
 
   resetRanks = () => {
     const { firebase } = this.props;
@@ -182,6 +139,7 @@ class Main extends React.Component {
       result.source.index,
       result.destination.index
     );
+    this.optionsRef.set(newOptions);
 
     this.setState(prevState => ({
       ...prevState,
@@ -189,13 +147,21 @@ class Main extends React.Component {
     }));
   };
 
+  handleChangeIsRanks = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      isRanks: !prevState.isRanks
+    }));
+  };
+
   render() {
-    const { isVisible, options, ranksToCompare } = this.state;
+    const { isRanks, options, ranksToCompare } = this.state;
     return (
       <>
-        <Header key="header" />
+        <Header key="header" changeIsRanks={this.handleChangeIsRanks} />
 
-        <Background upOrDown={isVisible ? "up" : "down"} />
+        <Background upOrDown={isRanks ? "up" : "down"} />
+        <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
 
         <LayoutContainer {...this.props}>
           <button type="button" onClick={this.resetRanks}>
@@ -203,16 +169,18 @@ class Main extends React.Component {
           </button>
 
           <DragDropContext onDragEnd={this.onDragEnd}>
-            <Droppable droppableId="droppable">
+            <Droppable droppableId="droppable" isDropDisabled={isRanks}>
               {(provided, snapshot) => (
                 <StyledListContainer
                   ref={provided.innerRef}
                   style={getListStyle(snapshot.isDraggingOver)}
-                  pose={isVisible ? "ranks" : "trades"}
+                  pose={isRanks ? "ranks" : "trades"}
                 >
                   <InnerList
                     options={options}
                     ranksToCompare={ranksToCompare}
+                    handleSaveOptions={this.handleSaveOptions}
+                    isRanks={isRanks}
                   />
                   {provided.placeholder}
                 </StyledListContainer>
@@ -226,3 +194,58 @@ class Main extends React.Component {
 }
 
 export default withFirebase(Main);
+
+// code to use if i need to optimize performance in future,
+// led to bugs with droppable expanding while trying to drag
+
+// fullOptions = [];
+
+// isThisMounted = false;
+
+// constructor(props) {
+//   super(props);
+//   const { firebase } = props;
+//   const { displayName, email, photoURL, uid } = firebase.auth().currentUser;
+//   this.optionsRef = firebase.database().ref(`users/${uid}/ranks`);
+//   this.optionsRef.once("value", options => {
+//     if (options.val() == null) {
+//       this.writeUserData(uid, displayName, email, photoURL);
+//       this.resetRanks();
+//     } else {
+//       this.fullOptions = options.val();
+//       this.setState(prevState => ({
+//         ...prevState,
+//         options: options.val().slice(0, 1)
+//       }));
+//       this.recursive();
+//     }
+//   });
+// }
+
+// componentDidMount() {
+//   this.isThisMounted = true;
+//   this.recursive();
+// }
+
+// componentWillReceiveProps() {
+//   this.recursive();
+// }
+
+// componentWillUnmount() {
+//   this.isThisMounted = false;
+//   clearInterval(this.timeout);
+// }
+
+// recursive = () => {
+//   if (this.isThisMounted) {
+//     this.timeout = setTimeout(() => {
+//       const { options } = this.state;
+//       const hasMore = options.length + 1 < this.fullOptions.length;
+
+//       this.setState(prevState => ({
+//         options: this.fullOptions.slice(0, prevState.options.length + 1)
+//       }));
+//       if (hasMore) this.recursive();
+//     }, 0);
+//   }
+// };
