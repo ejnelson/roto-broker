@@ -21,31 +21,43 @@ const options = {
 function firebaseCallback(error, response, body) {
   if (!error && response.statusCode === 200) {
     const data = JSON.parse(body);
-    console.log(data);
     firebase
       .database()
       .ref("/nflData")
       .push({ original: data });
   }
 }
-export async function handler(event, context, callback) {
-  try {
-    const response = await request(options, firebaseCallback);
-    if (!response.ok) {
-      // NOT res.status >= 200 && res.status < 300
-      return { statusCode: response.status, body: response.statusText };
+export function handler(event, context, callback) {
+  // try {
+  request(options, (error, response, body) => {
+    if (!error && response.statusCode === 200) {
+      const data = JSON.parse(body);
+      callback(null, {
+        statusCode: response.statusCode,
+        body: JSON.stringify({ msg: data })
+      });
+      firebase
+        .database()
+        .ref("/nflData")
+        .push({ original: data });
+    } else {
+      callback(null, {
+        statusCode: response.statusCode,
+        body: JSON.stringify({ msg: response.status })
+      });
     }
-    const data = await response.json();
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ msg: data.value })
-    };
-  } catch (err) {
-    console.log(err); // output to netlify function log
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
-    };
-  }
+  });
 }
+
+// });
+// } catch (err) {
+//   console.log(err); // output to netlify function log
+//   callback(null, {
+//     statusCode: 500,
+//     body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
+//   });
+//   return {
+//     statusCode: 500,
+//     body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
+//   };
+// }
