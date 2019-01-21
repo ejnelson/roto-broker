@@ -5,7 +5,7 @@ import Switch from "@material-ui/core/Switch";
 import { withStyles } from "@material-ui/core/styles";
 import logo from "../images/roto-broker.png";
 import UserMenu from "./UserMenu";
-import Seo from "./Seo";
+import Seo from "./seo";
 import { withFirebase } from "./FirebaseContext";
 
 const Logo = styled.img`
