@@ -162,10 +162,7 @@ class Main extends React.Component {
     const { ranksOrTrades, options, ranksToCompare } = this.state;
     return (
       <>
-        <Header
-          key="header"
-          changeRanksOrTrades={this.handleChangeRanksOrTrades}
-        />
+        <Header changeRanksOrTrades={this.handleChangeRanksOrTrades} />
 
         <Background
           forRanksOrTrades="trades"
