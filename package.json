@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "author": "Erik Nelson <erik@ejnelson.com>",
   "dependencies": {
+    "@firebase/app-types": "^0.3.2",
     "@material-ui/core": "^3.8.1",
     "@material-ui/icons": "^3.0.1",
     "babel-plugin-styled-components": "^1.10.0",
@@ -21,7 +22,6 @@
     "gatsby-source-filesystem": "^2.0.12",
     "gatsby-transformer-sharp": "^2.1.10",
     "netlify-lambda": "^1.2.0",
-    "node-fetch": "^2.3.0",
     "popmotion": "^8.6.0",
     "prop-types": "^15.6.2",
     "react": "^16.7.0",

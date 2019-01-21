@@ -3,8 +3,8 @@ import { Link } from "gatsby";
 import styled from "styled-components";
 import Switch from "@material-ui/core/Switch";
 import { withStyles } from "@material-ui/core/styles";
-import UserMenu from "./UserMenu";
 import logo from "../images/roto-broker.png";
+import UserMenu from "./UserMenu";
 import Seo from "./Seo";
 import { withFirebase } from "./FirebaseContext";
 
