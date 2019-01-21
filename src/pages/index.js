@@ -5,7 +5,7 @@ import React from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import posed from "react-pose";
 import styled from "styled-components";
-import Header from "../components/header";
+import Header from "../components/Header";
 import Background from "../containers/Background";
 import LayoutContainer from "../containers/LayoutContainer";
 import LeagueSelection from "../containers/LeagueSelection";

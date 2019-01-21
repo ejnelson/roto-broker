@@ -3,7 +3,7 @@ import { StyledFirebaseAuth } from "react-firebaseui";
 
 import { getUiConfig } from "../services/firebase";
 import { withFirebase } from "../components/FirebaseContext";
-import Header from "../components/header";
+import Header from "../components/Header";
 
 const SignIn = ({ firebase }) => (
   <div>
