@@ -4,7 +4,9 @@ const obj = {
   foo: "bar"
 };
 export function handler(event, context, callback) {
-  console.log("queryStringParameters", event.queryStringParameters);
+  console.log("event", event);
+  console.log("context", context);
+
   callback(null, {
     statusCode: 200,
     body: JSON.stringify({ msg: "Hello, World!", ...obj })
