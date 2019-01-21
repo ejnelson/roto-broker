@@ -18,17 +18,11 @@ const options = {
     "Ocp-Apim-Subscription-Key": "17611b8bcbb649fd808febd543b4a8a5"
   }
 };
-function firebaseCallback(error, response, body) {
-  if (!error && response.statusCode === 200) {
-    const data = JSON.parse(body);
-    firebase
-      .database()
-      .ref("/nflData")
-      .push({ original: data });
-  }
-}
+
 export function handler(event, context, callback) {
-  // try {
+  console.log(`received request: ${event}`);
+  console.log(`context: ${context}`);
+
   request(options, (error, response, body) => {
     if (!error && response.statusCode === 200) {
       const data = JSON.parse(body);
@@ -48,16 +42,3 @@ export function handler(event, context, callback) {
     }
   });
 }
-
-// });
-// } catch (err) {
-//   console.log(err); // output to netlify function log
-//   callback(null, {
-//     statusCode: 500,
-//     body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
-//   });
-//   return {
-//     statusCode: 500,
-//     body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
-//   };
-// }
