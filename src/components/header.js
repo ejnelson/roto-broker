@@ -5,7 +5,7 @@ import Switch from "@material-ui/core/Switch";
 import { withStyles } from "@material-ui/core/styles";
 import UserMenu from "./UserMenu";
 import logo from "../images/roto-broker.png";
-import SEO from "./Seo";
+import Seo from "./Seo";
 import { withFirebase } from "./FirebaseContext";
 
 const Logo = styled.img`
@@ -50,7 +50,7 @@ class Header extends React.Component {
     const { checked } = this.state;
     return (
       <HeaderBar>
-        <SEO
+        <Seo
           title="Home"
           keywords={[`fantasy football`, `roto`, `trade`, "trade help"]}
         />

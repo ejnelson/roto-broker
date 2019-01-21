@@ -14,7 +14,7 @@ const detailsQuery = graphql`
     }
   }
 `;
-function SEO({ description, lang, meta, keywords, title }) {
+function Seo({ description, lang, meta, keywords, title }) {
   return (
     <StaticQuery
       query={detailsQuery}
@@ -80,7 +80,7 @@ function SEO({ description, lang, meta, keywords, title }) {
   );
 }
 
-SEO.defaultProps = {
+Seo.defaultProps = {
   lang: `en`,
   meta: [],
   keywords: [],
@@ -88,7 +88,7 @@ SEO.defaultProps = {
     "the best new tool to help you get fantasy football trades done with your league mates!"
 };
 
-SEO.propTypes = {
+Seo.propTypes = {
   description: PropTypes.string,
   lang: PropTypes.string,
   meta: PropTypes.arrayOf(PropTypes.string),
@@ -96,4 +96,4 @@ SEO.propTypes = {
   title: PropTypes.string.isRequired
 };
 
-export default SEO;
+export default Seo;
