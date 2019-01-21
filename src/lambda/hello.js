@@ -1,3 +1,4 @@
+/* eslint import/prefer-default-export: 0 */
 // show object spread works, i.e. babel works
 const obj = {
   foo: "bar"

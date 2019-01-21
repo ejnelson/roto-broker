@@ -1,3 +1,5 @@
+/* eslint import/prefer-default-export: 0 */
+
 import firebase from "firebase";
 import request from "request";
 
@@ -26,7 +28,7 @@ function firebaseCallback(error, response, body) {
       .push({ original: data });
   }
 }
-export default async function handler(event, context, callback) {
+export async function handler(event, context, callback) {
   try {
     const response = await request(options, firebaseCallback);
     if (!response.ok) {

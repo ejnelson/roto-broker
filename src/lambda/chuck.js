@@ -1,3 +1,5 @@
+/* eslint import/prefer-default-export: 0 */
+
 import fetch from "node-fetch";
 
 export async function handler(event, context) {
