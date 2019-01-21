@@ -1,11 +1,11 @@
 import React from "react";
-import { navigate, Link } from "gatsby";
+import { Link } from "gatsby";
 import styled from "styled-components";
-// import FormControlLabel from "@material-ui/core/FormControlLabel";
-// import Switch from "@material-ui/core/Switch";
+import Switch from "@material-ui/core/Switch";
+import { withStyles } from "@material-ui/core/styles";
 import UserMenu from "./UserMenu";
 import logo from "../images/roto-broker.png";
-import SEO from "./seo";
+import SEO from "./Seo";
 import { withFirebase } from "./FirebaseContext";
 
 const Logo = styled.img`
@@ -19,24 +19,35 @@ const HeaderBar = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+const styles = {
+  icon: {
+    background: "black"
+  },
+  iconChecked: {
+    background: "purple"
+  }
+};
+
 class Header extends React.Component {
-  // state = {
-  //   checked: false
-  // };
+  // ranks is false, trades is true
+  state = {
+    checked: false
+  };
 
   handleChange = name => event => {
+    const { changeRanksOrTrades } = this.props;
     this.setState({ [name]: event.target.checked });
-    console.log(name);
-    console.log(event.target.checked);
+
     if (event.target.checked) {
-      navigate("/trades");
+      changeRanksOrTrades("trades");
     } else {
-      navigate("/ranks");
+      changeRanksOrTrades("ranks");
     }
   };
 
   render() {
-    const { siteTitle, firebase, changeIsRanks } = this.props;
+    const { siteTitle, firebase, classes } = this.props;
+    const { checked } = this.state;
     return (
       <HeaderBar>
         <SEO
@@ -46,15 +57,25 @@ class Header extends React.Component {
         <Link to="/">
           <Logo src={logo} alt={siteTitle} />
         </Link>
+
         {firebase.auth().currentUser ? (
-          <button type="button" onClick={() => changeIsRanks()}>
-            change ranks/trades
-          </button>
+          <div>
+            ranks
+            <Switch
+              classes={classes}
+              checked={checked}
+              onChange={this.handleChange("checked")}
+              value="checked"
+              color="default"
+            />
+            trades
+          </div>
         ) : null}
+
         {firebase.auth().currentUser ? <UserMenu /> : null}
       </HeaderBar>
     );
   }
 }
 
-export default withFirebase(Header);
+export default withStyles(styles)(withFirebase(Header));

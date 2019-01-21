@@ -22,11 +22,11 @@ class InnerList extends React.Component {
 
   // do not re-render if the students list has not changed
   shouldComponentUpdate(nextProps) {
-    const { options, ranksToCompare, isRanks } = this.props;
+    const { options, ranksToCompare, ranksOrTrades } = this.props;
     if (
       options === nextProps.options &&
       ranksToCompare === nextProps.ranksToCompare &&
-      isRanks === nextProps.isRanks
+      ranksOrTrades === nextProps.ranksOrTrades
     ) {
       return false;
     }
@@ -34,7 +34,12 @@ class InnerList extends React.Component {
   }
 
   render() {
-    const { options, ranksToCompare, handleSaveOptions, isRanks } = this.props;
+    const {
+      options,
+      ranksToCompare,
+      handleSaveOptions,
+      ranksOrTrades
+    } = this.props;
     if (options.length > 0) {
       return options.map((option, index) => {
         const pos = ranksToCompare
@@ -51,7 +56,7 @@ class InnerList extends React.Component {
             key={option.id}
             draggableId={option.id}
             index={index}
-            isDragDisabled={isRanks}
+            isDragDisabled={ranksOrTrades === "trades"}
           >
             {(provided, snapshot) => (
               <PlayerContainer
@@ -65,6 +70,7 @@ class InnerList extends React.Component {
                 option={option}
                 compareValue={value}
                 saveOptions={handleSaveOptions}
+                ranksOrTrades={ranksOrTrades}
               />
             )}
           </Draggable>

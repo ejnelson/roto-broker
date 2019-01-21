@@ -4,7 +4,8 @@ const createOptionsFromRanks = async ranksList =>
     position: player.Pos,
     team: player.Team,
     rank: i + 1,
-    id: player.Overall
+    id: player.Overall,
+    owned: false
   }));
 
 const getAllOptions = async firebase => {

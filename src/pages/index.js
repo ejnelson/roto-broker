@@ -5,7 +5,7 @@ import React from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import posed from "react-pose";
 import styled from "styled-components";
-import Header from "../components/header";
+import Header from "../components/Header";
 import Background from "../containers/Background";
 import LayoutContainer from "../containers/LayoutContainer";
 import LeagueSelection from "../containers/LeagueSelection";
@@ -52,7 +52,11 @@ const StyledListContainer = styled(ListContainer)`
 `;
 
 class Main extends React.Component {
-  state = { isRanks: true, options: [{ id: 1 }], ranksToCompare: [{}] };
+  state = {
+    ranksOrTrades: "ranks",
+    options: [{ id: 1 }],
+    ranksToCompare: [{}]
+  };
 
   optionsRef = null;
 
@@ -147,21 +151,35 @@ class Main extends React.Component {
     }));
   };
 
-  handleChangeIsRanks = () => {
+  handleChangeRanksOrTrades = ranksOrTrades => {
     this.setState(prevState => ({
       ...prevState,
-      isRanks: !prevState.isRanks
+      ranksOrTrades
     }));
   };
 
   render() {
-    const { isRanks, options, ranksToCompare } = this.state;
+    const { ranksOrTrades, options, ranksToCompare } = this.state;
     return (
       <>
-        <Header key="header" changeIsRanks={this.handleChangeIsRanks} />
+        <Header
+          key="header"
+          changeRanksOrTrades={this.handleChangeRanksOrTrades}
+        />
 
-        <Background upOrDown={isRanks ? "up" : "down"} />
-        <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
+        <Background
+          forRanksOrTrades="trades"
+          color="#8c52ff"
+          ranksOrTrades={ranksOrTrades}
+        />
+        <Background
+          forRanksOrTrades="ranks"
+          color="black"
+          ranksOrTrades={ranksOrTrades}
+        />
+        {ranksOrTrades === "trades" ? (
+          <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
+        ) : null}
 
         <LayoutContainer {...this.props}>
           <button type="button" onClick={this.resetRanks}>
@@ -169,18 +187,22 @@ class Main extends React.Component {
           </button>
 
           <DragDropContext onDragEnd={this.onDragEnd}>
-            <Droppable droppableId="droppable" isDropDisabled={isRanks}>
+            <Droppable
+              droppableId="droppable"
+              isDropDisabled={ranksOrTrades === "trades"}
+            >
               {(provided, snapshot) => (
                 <StyledListContainer
                   ref={provided.innerRef}
                   style={getListStyle(snapshot.isDraggingOver)}
-                  pose={isRanks ? "ranks" : "trades"}
+                  pose={ranksOrTrades}
+                  initialPose="ranks"
                 >
                   <InnerList
                     options={options}
                     ranksToCompare={ranksToCompare}
                     handleSaveOptions={this.handleSaveOptions}
-                    isRanks={isRanks}
+                    ranksOrTrades={ranksOrTrades}
                   />
                   {provided.placeholder}
                 </StyledListContainer>

@@ -6,13 +6,13 @@ const Bg = posed.div({
   up: {
     y: 0,
     transition: {
-      default: { ease: "easeInOut", duration: 3000 }
+      default: { ease: "easeInOut", duration: 2000 }
     }
   },
   down: {
     y: "100%",
     transition: {
-      default: { ease: "easeInOut", duration: 3000 }
+      default: { ease: "easeInOut", duration: 2000 }
     }
   }
 });
@@ -25,13 +25,19 @@ const StyledBg = styled(Bg)`
   z-index: -1;
   background: radial-gradient(
     ellipse at bottom center,
-    #8c52ff,
+    ${props => props.color || "palevioletred"},
     rgba(0, 0, 0, 0) 50%
   );
 `;
 const Background = props => {
-  const { upOrDown } = props;
-  return <StyledBg initialPose="closed" pose={upOrDown} />;
+  const { ranksOrTrades, forRanksOrTrades, color } = props;
+  return (
+    <StyledBg
+      initialPose={ranksOrTrades === forRanksOrTrades ? "up" : "down"}
+      pose={ranksOrTrades === forRanksOrTrades ? "up" : "down"}
+      color={color}
+    />
+  );
 };
 
 export default Background;

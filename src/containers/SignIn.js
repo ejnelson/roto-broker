@@ -3,7 +3,7 @@ import { StyledFirebaseAuth } from "react-firebaseui";
 
 import { getUiConfig } from "../services/firebase";
 import { withFirebase } from "../components/FirebaseContext";
-import Header from "../components/header";
+import Header from "../components/Header";
 
 const SignIn = ({ firebase }) => (
   <div>
@@ -12,7 +12,7 @@ const SignIn = ({ firebase }) => (
       style={{
         margin: "0 auto",
         maxWidth: 960,
-        padding: "1.45rem 1.0875rem",
+        padding: "1.45rem 1.0875rem"
       }}
     >
       <h4>Hey, please login to continue</h4>

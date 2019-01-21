@@ -33,10 +33,16 @@ module.exports = {
         name: "Roto-Broker",
         short_name: "Roto-Bro",
         start_url: "/",
-        background_color: "#ffb200",
-        theme_color: "#663399",
+        background_color: "#8c52ff",
+        theme_color: "#8c52ff",
         display: "minimal-ui",
         icon: "src/images/rotobrokericon.png" // This path is relative to the root of the site.
+      }
+    },
+    {
+      resolve: `gatsby-plugin-typography`,
+      options: {
+        pathToConfigModule: `src/utils/typography`
       }
     },
     "gatsby-plugin-layout",

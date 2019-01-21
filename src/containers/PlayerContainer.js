@@ -2,10 +2,11 @@ import React from "react";
 import posed from "react-pose";
 import styled from "styled-components";
 import Checkbox from "@material-ui/core/Checkbox";
+import { rhythm } from "../utils/typography";
 
 const Player = posed.div({
   ranks: {
-    opacity: 0.5,
+    opacity: 1,
     scaleY: 1,
 
     transition: {
@@ -13,7 +14,7 @@ const Player = posed.div({
     }
   },
   trades: {
-    opacity: 1,
+    opacity: 0.6,
     scaleY: 1,
     transition: {
       default: { ease: "easeInOut", duration: 100 }
@@ -22,9 +23,7 @@ const Player = posed.div({
 });
 
 const StyledPlayer = styled(Player)`
-  background-color: blue;
-
-  left: -50%;
+  height: ${rhythm(2)};
 `;
 const StyledCheckbox = styled(Checkbox)`
   /* align-self: flex-start; */
@@ -65,7 +64,6 @@ class PlayerContainer extends React.Component {
 
   render() {
     const { owned } = this.state;
-
     const {
       option,
       iRef,
@@ -76,18 +74,14 @@ class PlayerContainer extends React.Component {
       compareValue
     } = this.props;
     return (
-      <StyledPlayer
-        {...dProps}
-        {...dHProps}
-        ref={iRef}
-        style={style}
-        pose={ranksOrTrades}
-      >
-        <StyledCheckbox
-          checked={owned || false}
-          onChange={this.handleChange("owned")}
-          value={option.name}
-        />
+      <StyledPlayer {...dProps} {...dHProps} ref={iRef} style={style}>
+        {ranksOrTrades === "trades" ? (
+          <StyledCheckbox
+            checked={owned || false}
+            onChange={this.handleChange("owned")}
+            value={option.name}
+          />
+        ) : null}
         {option.name}, {option.rank}, {option.position}, {compareValue}
       </StyledPlayer>
     );
