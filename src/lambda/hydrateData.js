@@ -1,7 +1,8 @@
 /* eslint import/prefer-default-export: 0 */
+/* eslint no-unused-vars: 0 */
 
+import fetch from "node-fetch";
 import firebase from "firebase";
-import request from "request";
 
 const config = {
   apiKey: "AIzaSyA8rA-zxGf9rcQLClghCdIhLzMl9VkbYlw",
@@ -12,33 +13,36 @@ const config = {
   messagingSenderId: "1077190018456"
 };
 firebase.initializeApp(config);
+
 const options = {
-  url: "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
-  headers: {
-    "Ocp-Apim-Subscription-Key": "17611b8bcbb649fd808febd543b4a8a5"
-  }
+  headers: { "Ocp-Apim-Subscription-Key": "17611b8bcbb649fd808febd543b4a8a5" }
 };
 
-export function handler(event, context, callback) {
-  console.log(`received request: ${event}`);
-  console.log(`context: ${context}`);
-
-  request(options, (error, response, body) => {
-    if (!error && response.statusCode === 200) {
-      const data = JSON.parse(body);
-      callback(null, {
-        statusCode: response.statusCode,
-        body: JSON.stringify({ msg: data })
-      });
-      firebase
-        .database()
-        .ref("/nflData")
-        .push({ original: data });
-    } else {
-      callback(null, {
-        statusCode: response.statusCode,
-        body: JSON.stringify({ msg: response.status })
-      });
+export async function handler(event, context) {
+  try {
+    const response = await fetch(
+      "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
+      options
+    );
+    if (!response.ok) {
+      // NOT res.status >= 200 && res.status < 300
+      return { statusCode: response.status, body: response.statusText };
     }
-  });
+    const data = await response.json();
+    console.log("got it");
+    firebase
+      .database()
+      .ref("/nflData")
+      .push({ original: data });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ msg: data })
+    };
+  } catch (err) {
+    console.log(err); // output to netlify function log
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
+    };
+  }
 }
