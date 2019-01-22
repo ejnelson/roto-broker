@@ -1,5 +1,4 @@
 /* eslint import/prefer-default-export: 0 */
-/* eslint no-unused-vars: 0 */
 
 import fetch from "node-fetch";
 import firebase from "firebase";
@@ -29,7 +28,6 @@ export async function handler(event, context) {
       return { statusCode: response.status, body: response.statusText };
     }
     const data = await response.json();
-    console.log("got it");
 
     return {
       statusCode: 200,
