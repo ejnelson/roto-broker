@@ -85,14 +85,16 @@ export async function handler(event, context, callback) {
         .then(checkStatus)
         .catch(err => console.error(err))
         .then(res => res.json())
-        .then(json => console.log(json));
+        .then(json => {
+          console.log(json);
+          return {
+            statusCode: 200,
+            body: JSON.stringify({ msg: "wedidit" })
+          };
+        });
     }
   });
   // });
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ msg: "wedidit" })
-  };
   // } catch (err) {
   //   console.log(err); // output to netlify function log
   //   return {
