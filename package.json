@@ -24,7 +24,6 @@
     "gatsby-source-filesystem": "^2.0.12",
     "gatsby-transformer-sharp": "^2.1.10",
     "googleapis": "^36.0.0",
-    "http-proxy-middleware": "^0.19.1",
     "netlify-lambda": "^1.2.0",
     "node-fetch": "^2.3.0",
     "popmotion": "^8.6.0",
