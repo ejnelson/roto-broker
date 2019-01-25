@@ -59,6 +59,7 @@ export async function handler(event, context, callback) {
   console.log("got it");
   // Use the JWT client to generate an access token.
   jwtClient.authorize(async (error, tokens) => {
+    console.log("Im gunna try to write to firebase now please");
     if (error) {
       console.log("Error making request to generate access token:", error);
     } else if (tokens.access_token === null) {
