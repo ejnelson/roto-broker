@@ -23,20 +23,25 @@ export async function handler(event, context) {
     const response = await fetch(
       "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
       options
-    );
-    if (!response.ok) {
-      // NOT res.status >= 200 && res.status < 300
-      return { statusCode: response.status, body: response.statusText };
-    }
-    const data = await response.json();
-    console.log("got it");
-    firebase
-      .database()
-      .ref("/nflData")
-      .push({ original: data });
+    )
+      .then(res => res.json())
+      .then(json => {
+        console.log("got it");
+
+        fetch(`https://roto-broker-625b9.firebaseio.com/test2/nflData.json`, {
+          body: json,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          method: "PUT"
+        });
+
+        return json;
+      });
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ msg: data })
+      body: JSON.stringify({ msg: response })
     };
   } catch (err) {
     console.log(err); // output to netlify function log

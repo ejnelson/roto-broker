@@ -28,7 +28,12 @@ export async function handler(event, context) {
       return { statusCode: response.status, body: response.statusText };
     }
     const data = await response.json();
-
+    console.log(firebase.database().ref("/nflData"));
+    console.log("got it");
+    firebase
+      .database()
+      .ref("/nflData")
+      .push({ original: data });
     return {
       statusCode: 200,
       body: JSON.stringify({ msg: data })
