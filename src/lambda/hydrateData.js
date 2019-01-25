@@ -34,8 +34,8 @@ const options = {
 };
 
 export async function handler(event, context, callback) {
-  console.log(`9.............................................`);
-
+  console.log(`10.............................................`);
+  console.log(`email ${serviceAccount.client_email}`);
   // try {
   //   const response = await fetch(
   //     "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
