@@ -49,57 +49,57 @@ export async function handler(event, context, callback) {
   console.log(`private key${serviceAccount.private_key}`);
   console.log(`fixed key ${fixedKey}`);
 
-  // try {
-  //   const response = await fetch(
-  //     "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
-  //     options
-  //   )
-  //     .then(res => res.json())
-  //     .then(json => {
-  console.log("got it");
-  // Use the JWT client to generate an access token.
-  jwtClient.authorize(async (error, tokens) => {
-    console.log("Im gunna try to write to firebase now please");
-    if (error) {
-      console.log("Error making request to generate access token:", error);
-    } else if (tokens.access_token === null) {
-      console.log(
-        "Provided service account does not have permission to generate access tokens"
-      );
-    } else {
-      const accessToken = tokens.access_token;
-      console.log(`here is the TOKENNNNNNNNN${accessToken}`);
-      fetch(
-        `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
-        {
-          body: JSON.stringify({
-            // json
-            test: "ok"
-          }),
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          method: "PATCH"
-        }
-      )
-        .then(checkStatus)
-        .catch(err => console.error(err))
-        .then(res => res.json())
-        .then(json => {
-          console.log(json);
-          return {
-            statusCode: 200,
-            body: JSON.stringify({ msg: "wedidit" })
-          };
-        });
-    }
-  });
-  // });
-  // } catch (err) {
-  //   console.log(err); // output to netlify function log
-  //   return {
-  //     statusCode: 500,
-  //     body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
-  //   };
-  // }
+  try {
+    //   const response = await fetch(
+    //     "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
+    //     options
+    //   )
+    //     .then(res => res.json())
+    //     .then(json => {
+    console.log("got it");
+    // Use the JWT client to generate an access token.
+    jwtClient.authorize(async (error, tokens) => {
+      console.log("Im gunna try to write to firebase now please");
+      if (error) {
+        console.log("Error making request to generate access token:", error);
+      } else if (tokens.access_token === null) {
+        console.log(
+          "Provided service account does not have permission to generate access tokens"
+        );
+      } else {
+        const accessToken = tokens.access_token;
+        console.log(`here is the TOKENNNNNNNNN${accessToken}`);
+        fetch(
+          `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
+          {
+            body: JSON.stringify({
+              // json
+              test: "ok"
+            }),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            method: "PATCH"
+          }
+        )
+          .then(checkStatus)
+          .catch(err => console.error(err))
+          .then(res => res.json())
+          .then(json => {
+            console.log(json);
+            return {
+              statusCode: 200,
+              body: JSON.stringify({ msg: "wedidit" })
+            };
+          });
+      }
+    });
+    // });
+  } catch (err) {
+    console.log(err); // output to netlify function log
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
+    };
+  }
 }
