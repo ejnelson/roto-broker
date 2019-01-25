@@ -5,7 +5,6 @@ import { Link } from "gatsby";
 import styled from "styled-components";
 import Switch from "@material-ui/core/Switch";
 import { withStyles } from "@material-ui/core/styles";
-import fetch from "node-fetch";
 import logo from "../images/roto-broker.png";
 import UserMenu from "./UserMenu";
 import Seo from "./seo";
@@ -48,24 +47,6 @@ class Header extends React.Component {
     }
   };
 
-  newFunction = () => {
-    const { firebase } = this.props;
-    const { uid } = firebase.auth().currentUser;
-    console.log(`uid${uid}`);
-    const obj = {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Origin: "",
-        Authorization: `Bearer ${uid}`
-      },
-      body: uid
-    };
-    fetch("/.netlify/functions/newFunction", {
-      obj
-    }).then(response => response.json().then(json => console.log(json)));
-  };
-
   render() {
     const { siteTitle, firebase, classes } = this.props;
     const { checked } = this.state;
@@ -78,9 +59,6 @@ class Header extends React.Component {
         <Link to="/">
           <Logo src={logo} alt={siteTitle} />
         </Link>
-        <button type="button" onClick={this.newFunction}>
-          do the function
-        </button>
         {firebase.auth().currentUser ? (
           <div>
             ranks
