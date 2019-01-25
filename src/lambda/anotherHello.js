@@ -52,12 +52,26 @@ export function handler(event, context, callback) {
           },
           method: "PATCH"
         }
-      ).then(() => {
-        callback(null, {
-          statusCode: 200,
-          body: "Score +1"
+      )
+        .catch(err => {
+          console.error(err);
+          callback({
+            statusCode: 400,
+            body: JSON.stringify({
+              message: "error2"
+            })
+          });
+        })
+        .then(res => res.json())
+        .then(json => {
+          console.log(json);
+          callback({
+            statusCode: 200,
+            body: JSON.stringify({
+              msg: "wedidit"
+            })
+          });
         });
-      });
     }
   });
 }

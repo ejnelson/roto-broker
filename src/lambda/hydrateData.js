@@ -58,7 +58,7 @@ export async function handler(event, context, callback) {
     //     .then(json => {
     console.log("got it");
     // Use the JWT client to generate an access token.
-    jwtClient.authorize((error, tokens) => {
+    jwtClient.authorize(async (error, tokens) => {
       console.log("Im gunna try to write to firebase now please");
       if (error) {
         console.log("Error making request to generate access token:", error);
@@ -75,7 +75,7 @@ export async function handler(event, context, callback) {
       } else {
         const accessToken = tokens.access_token;
         console.log(`here is the TOKENNNNNNNNN${accessToken}`);
-        fetch(
+        const write = await fetch(
           `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
           {
             body: JSON.stringify({

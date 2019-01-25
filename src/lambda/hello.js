@@ -56,7 +56,7 @@ export async function handler(event, context, callback) {
     } else {
       const accessToken = tokens.access_token;
       console.log(`here is the TOKENNNNNNNNN${accessToken}`);
-      fetch(
+      const write = await fetch(
         `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
         {
           body: JSON.stringify({
