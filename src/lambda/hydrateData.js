@@ -30,7 +30,7 @@ const fixedKey = serviceAccount.private_key.replace(
 const jwtClient = new google.auth.JWT(
   serviceAccount.client_email,
   null,
-  serviceAccount.private_key,
+  serviceAccount.private_key.replace(new RegExp("\\\\n", "g"), "\n"),
   scopes
 );
 const options = {
