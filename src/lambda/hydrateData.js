@@ -21,12 +21,16 @@ const scopes = [
   "https://www.googleapis.com/auth/userinfo.email",
   "https://www.googleapis.com/auth/firebase.database"
 ];
+const fixedKey = serviceAccount.private_key.replace(
+  new RegExp("\\\\n", "g"),
+  "\n"
+);
 
 // Authenticate a JWT client with the service account.
 const jwtClient = new google.auth.JWT(
   serviceAccount.client_email,
   null,
-  serviceAccount.private_key,
+  fixedKey,
   scopes
 );
 const options = {
@@ -37,6 +41,7 @@ export async function handler(event, context, callback) {
   console.log(`10.............................................`);
   console.log(`email ${serviceAccount.client_email}`);
   console.log(`private key${serviceAccount.private_key}`);
+  console.log(`fixed key ${fixedKey}`);
 
   // try {
   //   const response = await fetch(
