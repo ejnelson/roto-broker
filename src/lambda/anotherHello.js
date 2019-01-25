@@ -1,6 +1,7 @@
 /* eslint import/prefer-default-export: 0 */
 /* eslint no-unused-vars: 0 */
-const firebase = require("firebase");
+import { google } from "googleapis";
+import fetch from "node-fetch";
 
 const serviceAccount = {
   type: process.env.FB_TYPE,
@@ -15,25 +16,48 @@ const serviceAccount = {
   client_x509_cert_url: process.env.FB_CLIENT_CERT
 };
 
-firebase.initializeApp({
-  serviceAccount: {
-    projectId: serviceAccount.project_id,
-    clientEmail: serviceAccount.client_email,
-    privateKey: serviceAccount.private_key.replace(
-      new RegExp("\\\\n", "g"),
-      "\n"
-    )
-  },
-  databaseURL: "https://roto-broker-625b9.firebaseio.com/"
-});
+const scopes = [
+  "https://www.googleapis.com/auth/userinfo.email",
+  "https://www.googleapis.com/auth/firebase.database"
+];
 
-console.log(process.env.fb_privateKey);
-export async function handler(event, context, callback) {
-  firebase
-    .database()
-    .ref("users")
-    .once("value", snapshot => {
-      console.log(snapshot.val());
-      process.exit();
-    });
+// Authenticate a JWT client with the service account.
+const jwtClient = new google.auth.JWT(
+  serviceAccount.client_email,
+  null,
+  serviceAccount.private_key.replace(new RegExp("\\\\n", "g"), "\n"),
+  scopes
+);
+
+export function handler(event, context, callback) {
+  // Use the JWT client to generate an access token.
+  jwtClient.authorize(async (error, tokens) => {
+    if (error) {
+      console.log("Error making request to generate access token:", error);
+    } else if (tokens.access_token === null) {
+      console.log(
+        "Provided service account does not have permission to generate access tokens"
+      );
+    } else {
+      const accessToken = tokens.access_token;
+      const write = await fetch(
+        `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
+        {
+          body: JSON.stringify({
+            // json
+            test: "ok"
+          }),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          method: "PATCH"
+        }
+      ).then(() => {
+        callback(null, {
+          statusCode: 200,
+          body: "Score +1"
+        });
+      });
+    }
+  });
 }
