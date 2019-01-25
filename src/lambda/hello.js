@@ -44,6 +44,13 @@ export async function handler(event, context, callback) {
   //     .then(res => res.json())
   //     .then(json => {
   console.log("got it");
+  jwtClient.authorize((error, tokens) => {
+    if (error) {
+      console.error("Error connecting to GA:", error);
+    } else {
+      console.log("Authorized!", tokens);
+    }
+  });
   // Use the JWT client to generate an access token.
   jwtClient.authorize(async (error, tokens) => {
     if (error) {
