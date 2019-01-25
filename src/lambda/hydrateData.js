@@ -36,6 +36,9 @@ const options = {
 export async function handler(event, context, callback) {
   console.log(`10.............................................`);
   console.log(`email ${serviceAccount.client_email}`);
+  console.log(`context private key${context.FB_PRIVATE_KEY}`);
+  console.log(`context private key${context.env.FB_PRIVATE_KEY}`);
+
   // try {
   //   const response = await fetch(
   //     "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
