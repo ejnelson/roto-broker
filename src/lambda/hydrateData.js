@@ -82,6 +82,7 @@ export async function handler(event, context, callback) {
         }
       )
         .then(checkStatus)
+        .catch(err => console.error(err))
         .then(res => res.json())
         .then(json => console.log(json));
     }
