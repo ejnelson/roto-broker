@@ -36,7 +36,13 @@ const jwtClient = new google.auth.JWT(
 const options = {
   headers: { "Ocp-Apim-Subscription-Key": process.env.FANTASY_API_KEY }
 };
-
+function checkStatus(res) {
+  if (res.ok) {
+    // res.status >= 200 && res.status < 300
+    return res;
+  }
+  throw new Error("bad fetch");
+}
 export async function handler(event, context, callback) {
   console.log(`10.............................................`);
   console.log(`email ${serviceAccount.client_email}`);
@@ -74,7 +80,10 @@ export async function handler(event, context, callback) {
           },
           method: "PATCH"
         }
-      );
+      )
+        .then(checkStatus)
+        .then(res => res.json())
+        .then(json => console.log(json));
     }
   });
   // });
