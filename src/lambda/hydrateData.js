@@ -45,8 +45,8 @@ function checkStatus(res) {
 }
 export async function handler(event, context, callback) {
   console.log(`10.............................................`);
-  console.log(`email ${serviceAccount.client_email}`);
-  console.log(`private key${serviceAccount.private_key}`);
+  console.log(`email   ${serviceAccount.client_email}`);
+  console.log(`private key  ${serviceAccount.private_key}`);
   console.log(`fixed key ${fixedKey}`);
 
   try {
@@ -58,7 +58,7 @@ export async function handler(event, context, callback) {
     //     .then(json => {
     console.log("got it");
     // Use the JWT client to generate an access token.
-    jwtClient.authorize(async (error, tokens) => {
+    jwtClient.authorize((error, tokens) => {
       console.log("Im gunna try to write to firebase now please");
       if (error) {
         console.log("Error making request to generate access token:", error);
