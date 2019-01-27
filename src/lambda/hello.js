@@ -69,18 +69,18 @@ export function handler(event, context, callback) {
               posted: json
             })
           });
-        })
-        .catch(err => {
-          console.log(JSON.stringify(err));
-          console.log(err.text());
-
-          callback({
-            statusCode: 400,
-            body: JSON.stringify({
-              message: err
-            })
-          });
         });
+      // .catch(err => {
+      //   console.log(JSON.stringify(err));
+      //   console.log(err.text());
+
+      //   callback({
+      //     statusCode: 400,
+      //     body: JSON.stringify({
+      //       message: err
+      //     })
+      //   });
+      // });
     }
   });
 }
