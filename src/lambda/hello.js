@@ -29,6 +29,7 @@ const jwtClient = new google.auth.JWT(
   scopes
 );
 function checkStatus(res) {
+  console.log(`status${res.status}`);
   if (res.ok) {
     // res.status >= 200 && res.status < 300
     return res;
@@ -51,7 +52,7 @@ export function handler(event, context, callback) {
         {
           body: JSON.stringify({
             // json
-            test: "ok12"
+            test: "ok123"
           }),
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -63,12 +64,18 @@ export function handler(event, context, callback) {
         .then(res => res.json())
         .then(json => {
           console.log(json);
-          callback({
+          return {
             statusCode: 200,
             body: JSON.stringify({
               posted: json
             })
-          });
+          };
+          // callback({
+          //   statusCode: 200,
+          //   body: JSON.stringify({
+          //     posted: json
+          //   })
+          // });
         });
       // .catch(err => {
       //   console.log(JSON.stringify(err));
