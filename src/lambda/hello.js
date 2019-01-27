@@ -51,7 +51,7 @@ export function handler(event, context, callback) {
         {
           body: JSON.stringify({
             // json
-            test: "ok1"
+            test: "ok12"
           }),
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
