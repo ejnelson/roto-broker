@@ -104,7 +104,7 @@ export async function handler(event, context, callback) {
             callback({
               statusCode: 200,
               body: JSON.stringify({
-                msg: "wedidit"
+                msg: "wedidit!"
               })
             });
           });
