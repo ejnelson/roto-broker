@@ -28,7 +28,13 @@ const jwtClient = new google.auth.JWT(
   serviceAccount.private_key.replace(new RegExp("\\\\n", "g"), "\n"),
   scopes
 );
-
+function checkStatus(res) {
+  if (res.ok) {
+    // res.status >= 200 && res.status < 300
+    return res;
+  }
+  throw new Error(res.statusText);
+}
 export function handler(event, context, callback) {
   // Use the JWT client to generate an access token.
   jwtClient.authorize(async (error, tokens) => {
@@ -53,6 +59,7 @@ export function handler(event, context, callback) {
           method: "PATCH"
         }
       )
+        .then(checkStatus)
         .then(res => res.json())
         .then(json => {
           console.log(json);
@@ -64,7 +71,9 @@ export function handler(event, context, callback) {
           });
         })
         .catch(err => {
-          console.error(JSON.stringify(err));
+          console.log(JSON.stringify(err));
+          console.log(err.text());
+
           callback({
             statusCode: 400,
             body: JSON.stringify({
