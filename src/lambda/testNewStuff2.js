@@ -36,10 +36,10 @@ function checkStatus(res) {
   }
   throw new Error(res.statusText);
 }
-export function handler(event, context, callback) {
+export async function handler(event, context, callback) {
   try {
     // Use the JWT client to generate an access token.
-    jwtClient.authorize(async (error, tokens) => {
+    const auth = await jwtClient.authorize(async (error, tokens) => {
       if (error) {
         console.log("Error making request to generate access token:", error);
       } else if (tokens.access_token === null) {
@@ -81,6 +81,7 @@ export function handler(event, context, callback) {
         return write;
       }
     });
+    return auth;
   } catch {
     console.log("ERROR");
 
