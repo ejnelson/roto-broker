@@ -64,18 +64,10 @@ export function handler(event, context, callback) {
         .then(res => res.json())
         .then(json => {
           console.log(json);
-          return {
+          callback({
             statusCode: 200,
-            body: JSON.stringify({
-              posted: json
-            })
-          };
-          // callback({
-          //   statusCode: 200,
-          //   body: JSON.stringify({
-          //     posted: json
-          //   })
-          // });
+            body: json
+          });
         });
       // .catch(err => {
       //   console.log(JSON.stringify(err));
