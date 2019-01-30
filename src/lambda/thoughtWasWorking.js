@@ -54,7 +54,7 @@ export function handler(event, context, callback) {
         }
       )
         .catch(err => {
-          console.error(err);
+          console.error(JSON.stringify(err));
           callback({
             statusCode: 400,
             body: JSON.stringify({

@@ -3,8 +3,6 @@
 import { google } from "googleapis";
 import fetch from "node-fetch";
 
-require("dotenv").config();
-
 const serviceAccount = {
   type: process.env.FB_TYPE,
   project_id: process.env.FB_PROJECT_ID,
@@ -17,6 +15,7 @@ const serviceAccount = {
   auth_provider_x509_cert_url: process.env.FB_AUTH_PROVIDER,
   client_x509_cert_url: process.env.FB_CLIENT_CERT
 };
+
 const scopes = [
   "https://www.googleapis.com/auth/userinfo.email",
   "https://www.googleapis.com/auth/firebase.database"
@@ -29,22 +28,15 @@ const jwtClient = new google.auth.JWT(
   serviceAccount.private_key.replace(new RegExp("\\\\n", "g"), "\n"),
   scopes
 );
-const options = {
-  headers: { "Ocp-Apim-Subscription-Key": process.env.FANTASY_API_KEY }
-};
-
-export async function handler(event, context, callback) {
-  console.log(`9.............................................`);
-
-  // try {
-  //   const response = await fetch(
-  //     "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
-  //     options
-  //   )
-  //     .then(res => res.json())
-  //     .then(json => {
-  console.log("got it");
-
+function checkStatus(res) {
+  console.log(`status${res.status}`);
+  if (res.ok) {
+    // res.status >= 200 && res.status < 300
+    return res;
+  }
+  throw new Error(res.statusText);
+}
+export function handler(event, context, callback) {
   // Use the JWT client to generate an access token.
   jwtClient.authorize(async (error, tokens) => {
     if (error) {
@@ -55,32 +47,47 @@ export async function handler(event, context, callback) {
       );
     } else {
       const accessToken = tokens.access_token;
-      console.log(`here is the TOKENNNNNNNNN${accessToken}`);
       const write = await fetch(
         `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
         {
           body: JSON.stringify({
             // json
-            test: "ok"
+            test: "ok123"
           }),
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
           method: "PATCH"
         }
-      );
+      )
+        .then(checkStatus)
+        .then(res => res.json())
+        .then(json => {
+          console.log(json);
+          return {
+            statusCode: 200,
+            body: JSON.stringify({
+              posted: json
+            })
+          };
+          // callback({
+          //   statusCode: 200,
+          //   body: JSON.stringify({
+          //     posted: json
+          //   })
+          // });
+        });
+      // .catch(err => {
+      //   console.log(JSON.stringify(err));
+      //   console.log(err.text());
+
+      //   callback({
+      //     statusCode: 400,
+      //     body: JSON.stringify({
+      //       message: err
+      //     })
+      //   });
+      // });
     }
   });
-  // });
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ msg: "wedidit" })
-  };
-  // } catch (err) {
-  //   console.log(err); // output to netlify function log
-  //   return {
-  //     statusCode: 500,
-  //     body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
-  //   };
-  // }
 }
