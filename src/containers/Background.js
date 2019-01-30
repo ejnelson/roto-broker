@@ -25,7 +25,7 @@ const StyledBg = styled(Bg)`
   z-index: -1;
   background: radial-gradient(
     ellipse at bottom center,
-    ${props => props.color || "palevioletred"},
+    ${props => props.color || "black"},
     rgba(0, 0, 0, 0) 50%
   );
 `;

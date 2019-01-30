@@ -5,6 +5,10 @@ import React from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import posed from "react-pose";
 import styled from "styled-components";
+import { withStyles } from "@material-ui/core/styles";
+import { ScrollSyncPane, ScrollSync } from "react-scroll-sync";
+
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Header from "../components/header";
 import Background from "../containers/Background";
 import LayoutContainer from "../containers/LayoutContainer";
@@ -12,7 +16,7 @@ import LeagueSelection from "../containers/LeagueSelection";
 
 import { withFirebase } from "../components/FirebaseContext";
 import getAllOptions from "../services/getRanks";
-import InnerList from "../components/InnerList";
+import InnerList from "../containers/InnerList";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -23,6 +27,16 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 const grid = 8;
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
+    color: "#8c52ff"
+  }
+});
 
 const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? "lightblue" : "lightgrey",
@@ -55,7 +69,8 @@ class Main extends React.Component {
   state = {
     ranksOrTrades: "ranks",
     options: [{ id: 1 }],
-    ranksToCompare: [{}]
+    ranksToCompare: [{}],
+    loading: false
   };
 
   optionsRef = null;
@@ -110,10 +125,15 @@ class Main extends React.Component {
 
   resetRanks = () => {
     const { firebase } = this.props;
+    this.setState(prevState => ({
+      ...prevState,
+      loading: true
+    }));
     getAllOptions(firebase).then(options => {
       this.optionsRef.set(options);
       this.setState(prevState => ({
         ...prevState,
+        loading: false,
         options
       }));
     });
@@ -159,11 +179,12 @@ class Main extends React.Component {
   };
 
   render() {
-    const { ranksOrTrades, options, ranksToCompare } = this.state;
+    const { ranksOrTrades, options, ranksToCompare, loading } = this.state;
+    const { classes } = this.props;
     return (
       <>
+        {loading ? <CircularProgress className={classes.progress} /> : ""}
         <Header changeRanksOrTrades={this.handleChangeRanksOrTrades} />
-
         <Background
           forRanksOrTrades="trades"
           color="#8c52ff"
@@ -177,42 +198,43 @@ class Main extends React.Component {
         {ranksOrTrades === "trades" ? (
           <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
         ) : null}
+        <ScrollSync>
+          <LayoutContainer {...this.props}>
+            <button type="button" onClick={this.resetRanks}>
+              Reset ranks
+            </button>
 
-        <LayoutContainer {...this.props}>
-          <button type="button" onClick={this.resetRanks}>
-            Reset ranks
-          </button>
-
-          <DragDropContext onDragEnd={this.onDragEnd}>
-            <Droppable
-              droppableId="droppable"
-              isDropDisabled={ranksOrTrades === "trades"}
-            >
-              {(provided, snapshot) => (
-                <StyledListContainer
-                  ref={provided.innerRef}
-                  style={getListStyle(snapshot.isDraggingOver)}
-                  pose={ranksOrTrades}
-                  initialPose="ranks"
-                >
-                  <InnerList
-                    options={options}
-                    ranksToCompare={ranksToCompare}
-                    handleSaveOptions={this.handleSaveOptions}
-                    ranksOrTrades={ranksOrTrades}
-                  />
-                  {provided.placeholder}
-                </StyledListContainer>
-              )}
-            </Droppable>
-          </DragDropContext>
-        </LayoutContainer>
+            <DragDropContext onDragEnd={this.onDragEnd}>
+              <Droppable
+                droppableId="droppable"
+                isDropDisabled={ranksOrTrades === "trades"}
+              >
+                {(provided, snapshot) => (
+                  <StyledListContainer
+                    ref={provided.innerRef}
+                    style={getListStyle(snapshot.isDraggingOver)}
+                    pose={ranksOrTrades}
+                    initialPose="ranks"
+                  >
+                    <InnerList
+                      options={options}
+                      ranksToCompare={ranksToCompare}
+                      handleSaveOptions={this.handleSaveOptions}
+                      ranksOrTrades={ranksOrTrades}
+                    />
+                    {provided.placeholder}
+                  </StyledListContainer>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </LayoutContainer>
+        </ScrollSync>
       </>
     );
   }
 }
 
-export default withFirebase(Main);
+export default withFirebase(withStyles(styles)(Main));
 
 // code to use if i need to optimize performance in future,
 // led to bugs with droppable expanding while trying to drag

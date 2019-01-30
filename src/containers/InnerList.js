@@ -1,6 +1,6 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
-import PlayerContainer from "../containers/PlayerContainer";
+import PlayerContainer from "./PlayerContainer";
 
 const grid = 8;
 

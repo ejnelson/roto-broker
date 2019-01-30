@@ -2,6 +2,7 @@ import React from "react";
 import posed from "react-pose";
 import styled from "styled-components";
 import Checkbox from "@material-ui/core/Checkbox";
+import { ScrollSyncPane, ScrollSync } from "react-scroll-sync";
 import { rhythm } from "../utils/typography";
 
 const Player = posed.div({
@@ -23,12 +24,24 @@ const Player = posed.div({
 });
 
 const StyledPlayer = styled(Player)`
-  height: ${rhythm(2)};
+  height: ${rhythm(4)};
 `;
 const StyledCheckbox = styled(Checkbox)`
   /* align-self: flex-start; */
 `;
-
+const ColumnSlot = styled.div`
+  width: 550px;
+  display: flex;
+`;
+const StatsContainer = styled.div`
+  display: flex;
+  height: ${rhythm(2)};
+`;
+const scrollStyle = {
+  display: "flex",
+  color: "purple",
+  overflow: "auto"
+};
 class PlayerContainer extends React.Component {
   state = {
     owned: false
@@ -82,7 +95,38 @@ class PlayerContainer extends React.Component {
             value={option.name}
           />
         ) : null}
-        {option.name}, {option.rank}, {option.position}, {compareValue}
+        <ColumnSlot>{option.name}</ColumnSlot>
+        <ScrollSyncPane>
+          <div style={{ overflow: "auto" }}>
+            <div
+              style={{
+                display: "flex",
+                minWidth: "min-content",
+                height: "80px"
+              }}
+            >
+              <ColumnSlot>{option.rank}</ColumnSlot>
+              <ColumnSlot>{option.position}</ColumnSlot>
+              <ColumnSlot>{option.team}</ColumnSlot>
+              <ColumnSlot>{option.projectedPoints}</ColumnSlot>
+              <ColumnSlot>{option.auctionValue}</ColumnSlot>
+              <ColumnSlot>{option.averageDraftPosition}</ColumnSlot>
+              <ColumnSlot>{compareValue}</ColumnSlot>
+              {/* <ColumnSlot>{option.stats.RushingAttempts || 0}</ColumnSlot>
+              <ColumnSlot>{option.stats.RushingYards || 0}</ColumnSlot>
+              <ColumnSlot>{option.stats.RushingTouchdowns || 0}</ColumnSlot>
+              <ColumnSlot>
+                {option.stats.RushingYardsPerAttempt || 0}
+              </ColumnSlot>
+              <ColumnSlot>{option.stats.Receptions || 0}</ColumnSlot>
+              <ColumnSlot>{option.stats.ReceivingYards || 0}</ColumnSlot>
+              <ColumnSlot>{option.stats.ReceivingTouchdowns || 0}</ColumnSlot>
+              <ColumnSlot>
+                {option.stats.ReceivingYardsPerReception || 0}
+              </ColumnSlot> */}
+            </div>
+          </div>
+        </ScrollSyncPane>
       </StyledPlayer>
     );
   }

@@ -3,6 +3,8 @@
 import { google } from "googleapis";
 import fetch from "node-fetch";
 
+require("dotenv").config();
+
 const serviceAccount = {
   type: process.env.FB_TYPE,
   project_id: process.env.FB_PROJECT_ID,
@@ -36,51 +38,87 @@ function checkStatus(res) {
   }
   throw new Error(res.statusText);
 }
-export function handler(event, context, callback) {
+const options = {
+  headers: { "Ocp-Apim-Subscription-Key": process.env.FANTASY_API_KEY }
+};
+
+export async function handler(event, context, callback) {
   try {
-    // Use the JWT client to generate an access token.
-    jwtClient.authorize(async (error, tokens) => {
-      if (error) {
-        console.log("Error making request to generate access token:", error);
-      } else if (tokens.access_token === null) {
-        console.log(
-          "Provided service account does not have permission to generate access tokens"
-        );
-      } else {
-        const accessToken = tokens.access_token;
-        const write = await fetch(
-          `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
-          {
-            body: JSON.stringify({
-              // json
-              test: "ok123"
-            }),
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded"
-            },
-            method: "PATCH"
-          }
+    const response = await fetch(
+      "https://api.fantasydata.net/v3/nfl/stats/JSON/FantasyPlayers",
+      options
+    )
+      .then(res => res.json())
+      .then(adpJson => {
+        fetch(
+          "https://api.fantasydata.net/v3/nfl/stats/JSON/PlayerSeasonStats/2018",
+          options
         )
-          .then(checkStatus)
-          .then(res => res.json())
-          .then(json => {
-            console.log(json);
-            // return {
-            //   statusCode: 200,
-            //   body: JSON.stringify({
-            //     posted: json
-            //   })
-            // };
-            return callback({
-              statusCode: 200,
-              body: JSON.stringify({
-                posted: json
-              })
+          .then(res2 => res2.json())
+          .then(async statsJson => {
+            const jsonToSend = adpJson.map(async playerWithADP => {
+              const playerStats = statsJson.find(
+                playerWithStats =>
+                  playerWithStats.PlayerID === playerWithADP.PlayerID
+              );
+              return { ...playerWithADP, stats: playerStats };
+            });
+            Promise.all(jsonToSend).then(completed => {
+              // Use the JWT client to generate an access token.
+              jwtClient.authorize(async (error, tokens) => {
+                if (error) {
+                  console.log(
+                    "Error making request to generate access token:",
+                    error
+                  );
+                } else if (tokens.access_token === null) {
+                  console.log(
+                    "Provided service account does not have permission to generate access tokens"
+                  );
+                } else {
+                  const accessToken = tokens.access_token;
+                  const write = await fetch(
+                    `https://roto-broker-625b9.firebaseio.com/nflData.json?access_token=${accessToken}`,
+                    {
+                      body: JSON.stringify({
+                        // json
+                        adp: completed
+                      }),
+                      headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                      },
+                      method: "PATCH"
+                    }
+                  )
+                    .then(checkStatus)
+                    .then(res => res.json())
+                    .then(json =>
+                      // console.log(json);
+                      // return {
+                      //   statusCode: 200,
+                      //   body: JSON.stringify({
+                      //     posted: json
+                      //   })
+                      // };
+                      callback({
+                        statusCode: 200,
+                        body: JSON.stringify({
+                          posted: "ok"
+                        })
+                      })
+                    );
+                  return write;
+                }
+                return callback({
+                  statusCode: 200,
+                  body: JSON.stringify({
+                    posted: "ok"
+                  })
+                });
+              });
             });
           });
-        return write;
-      }
-    });
+      });
   } catch {
     console.log("ERROR");
 
