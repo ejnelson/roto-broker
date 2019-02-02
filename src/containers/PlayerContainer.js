@@ -2,8 +2,8 @@ import React from "react";
 import posed from "react-pose";
 import styled from "styled-components";
 import Checkbox from "@material-ui/core/Checkbox";
-import { ScrollSyncPane, ScrollSync } from "react-scroll-sync";
 import { rhythm } from "../utils/typography";
+import PlayerStat from "../components/PlayerStat";
 
 const Player = posed.div({
   ranks: {
@@ -11,37 +11,32 @@ const Player = posed.div({
     scaleY: 1,
 
     transition: {
-      default: { ease: "easeInOut", duration: 100 }
+      opacity: { ease: "easeInOut", duration: 100 }
     }
   },
   trades: {
     opacity: 0.6,
     scaleY: 1,
     transition: {
-      default: { ease: "easeInOut", duration: 100 }
+      opacity: { ease: "easeInOut", duration: 100 }
     }
   }
 });
 
 const StyledPlayer = styled(Player)`
-  height: ${rhythm(4)};
+  height: ${rhythm(2)};
+  display: flex;
 `;
 const StyledCheckbox = styled(Checkbox)`
   /* align-self: flex-start; */
 `;
-const ColumnSlot = styled.div`
-  width: 550px;
-  display: flex;
+// const ColumnSlot = styled.div`
+//   flex: 1;
+// `;
+const NameColumnSlot = styled.div`
+  flex: 3;
 `;
-const StatsContainer = styled.div`
-  display: flex;
-  height: ${rhythm(2)};
-`;
-const scrollStyle = {
-  display: "flex",
-  color: "purple",
-  overflow: "auto"
-};
+
 class PlayerContainer extends React.Component {
   state = {
     owned: false
@@ -56,12 +51,13 @@ class PlayerContainer extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     const { owned } = this.state;
-    const { compareValue, option, dProps } = this.props;
+    const { compareValue, option, dProps, statsArray } = this.props;
     if (
       compareValue === nextProps.compareValue &&
       option.owned === owned &&
       nextState.owned === owned &&
-      dProps === nextProps.dProps
+      dProps === nextProps.dProps &&
+      JSON.stringify(statsArray) === JSON.stringify(nextProps.statsArray)
     ) {
       return false;
     }
@@ -84,7 +80,8 @@ class PlayerContainer extends React.Component {
       dHProps,
       style,
       ranksOrTrades,
-      compareValue
+      // compareValue,
+      statsArray
     } = this.props;
     return (
       <StyledPlayer {...dProps} {...dHProps} ref={iRef} style={style}>
@@ -95,38 +92,12 @@ class PlayerContainer extends React.Component {
             value={option.name}
           />
         ) : null}
-        <ColumnSlot>{option.name}</ColumnSlot>
-        <ScrollSyncPane>
-          <div style={{ overflow: "auto" }}>
-            <div
-              style={{
-                display: "flex",
-                minWidth: "min-content",
-                height: "80px"
-              }}
-            >
-              <ColumnSlot>{option.rank}</ColumnSlot>
-              <ColumnSlot>{option.position}</ColumnSlot>
-              <ColumnSlot>{option.team}</ColumnSlot>
-              <ColumnSlot>{option.projectedPoints}</ColumnSlot>
-              <ColumnSlot>{option.auctionValue}</ColumnSlot>
-              <ColumnSlot>{option.averageDraftPosition}</ColumnSlot>
-              <ColumnSlot>{compareValue}</ColumnSlot>
-              {/* <ColumnSlot>{option.stats.RushingAttempts || 0}</ColumnSlot>
-              <ColumnSlot>{option.stats.RushingYards || 0}</ColumnSlot>
-              <ColumnSlot>{option.stats.RushingTouchdowns || 0}</ColumnSlot>
-              <ColumnSlot>
-                {option.stats.RushingYardsPerAttempt || 0}
-              </ColumnSlot>
-              <ColumnSlot>{option.stats.Receptions || 0}</ColumnSlot>
-              <ColumnSlot>{option.stats.ReceivingYards || 0}</ColumnSlot>
-              <ColumnSlot>{option.stats.ReceivingTouchdowns || 0}</ColumnSlot>
-              <ColumnSlot>
-                {option.stats.ReceivingYardsPerReception || 0}
-              </ColumnSlot> */}
-            </div>
-          </div>
-        </ScrollSyncPane>
+        <NameColumnSlot>{option.name}</NameColumnSlot>
+        {statsArray
+          // .filter(stat => stat.isActive)
+          .map(stat => (
+            <PlayerStat option={option} stat={stat} key={stat.databaseName} />
+          ))}
       </StyledPlayer>
     );
   }

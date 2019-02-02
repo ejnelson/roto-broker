@@ -18,15 +18,15 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 });
 
 class InnerList extends React.Component {
-  // state = { ranksOrTrades: "ranks" };
-
-  // do not re-render if the students list has not changed
+  // do not re-render if the list has not changed
   shouldComponentUpdate(nextProps) {
-    const { options, ranksToCompare, ranksOrTrades } = this.props;
+    const { options, ranksToCompare, ranksOrTrades, statsArray } = this.props;
+
     if (
       options === nextProps.options &&
       ranksToCompare === nextProps.ranksToCompare &&
-      ranksOrTrades === nextProps.ranksOrTrades
+      ranksOrTrades === nextProps.ranksOrTrades &&
+      JSON.stringify(statsArray) === JSON.stringify(nextProps.statsArray)
     ) {
       return false;
     }
@@ -38,7 +38,8 @@ class InnerList extends React.Component {
       options,
       ranksToCompare,
       handleSaveOptions,
-      ranksOrTrades
+      ranksOrTrades,
+      statsArray
     } = this.props;
     if (options.length > 0) {
       return options.map((option, index) => {
@@ -71,6 +72,7 @@ class InnerList extends React.Component {
                 compareValue={value}
                 saveOptions={handleSaveOptions}
                 ranksOrTrades={ranksOrTrades}
+                statsArray={statsArray}
               />
             )}
           </Draggable>

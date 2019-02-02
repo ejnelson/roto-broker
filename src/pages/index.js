@@ -6,7 +6,6 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import posed from "react-pose";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/core/styles";
-import { ScrollSyncPane, ScrollSync } from "react-scroll-sync";
 
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Header from "../components/header";
@@ -17,6 +16,8 @@ import LeagueSelection from "../containers/LeagueSelection";
 import { withFirebase } from "../components/FirebaseContext";
 import getAllOptions from "../services/getRanks";
 import InnerList from "../containers/InnerList";
+import StatSelector from "../containers/StatSelector";
+import availableStats from "../services/availableStats";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -50,27 +51,30 @@ const ListContainer = posed.div({
     width: 1000,
 
     transition: {
-      default: { ease: "easeInOut", duration: 200 }
+      width: { ease: "easeInOut", duration: 200 }
     }
   },
   trades: {
     width: 400,
     transition: {
-      default: { ease: "easeInOut", duration: 200 }
+      width: { ease: "easeInOut", duration: 200 }
     }
   }
 });
 
 const StyledListContainer = styled(ListContainer)`
   color: white;
+  overflow: auto;
 `;
-
+// ---------------------------------------BEGIN COMPONENT -----------------------------------//
+// ---------------------------------------BEGIN COMPONENT -----------------------------------//
 class Main extends React.Component {
   state = {
     ranksOrTrades: "ranks",
     options: [{ id: 1 }],
     ranksToCompare: [{}],
-    loading: false
+    loading: false,
+    statsArray: availableStats
   };
 
   optionsRef = null;
@@ -178,12 +182,40 @@ class Main extends React.Component {
     }));
   };
 
+  newStatsArray = (items, index, stat) => [
+    ...items.slice(0, index),
+    {
+      prettyName: stat.prettyName,
+      databaseName: stat.databaseName,
+      inStats: stat.inStats,
+      isActive: !stat.isActive
+    },
+    ...items.slice(index + 1, items.length)
+  ];
+
+  handleUpdateDisplayedStats = stat => {
+    const { statsArray } = this.state;
+    const index = statsArray.indexOf(stat);
+    const newArray = this.newStatsArray(statsArray, index, stat);
+    console.log(`found the index${index}`);
+    this.setState(prevState => ({
+      ...prevState,
+      statsArray: newArray
+    }));
+  };
+
   render() {
-    const { ranksOrTrades, options, ranksToCompare, loading } = this.state;
+    const {
+      ranksOrTrades,
+      options,
+      ranksToCompare,
+      loading,
+      statsArray
+    } = this.state;
     const { classes } = this.props;
     return (
       <>
-        {loading ? <CircularProgress className={classes.progress} /> : ""}
+        {loading && <CircularProgress className={classes.progress} />}
         <Header changeRanksOrTrades={this.handleChangeRanksOrTrades} />
         <Background
           forRanksOrTrades="trades"
@@ -197,38 +229,42 @@ class Main extends React.Component {
         />
         {ranksOrTrades === "trades" ? (
           <LeagueSelection setRanksToCompare={this.setRanksToCompare} />
-        ) : null}
-        <ScrollSync>
-          <LayoutContainer {...this.props}>
-            <button type="button" onClick={this.resetRanks}>
-              Reset ranks
-            </button>
+        ) : (
+          <StatSelector
+            availableStats={statsArray}
+            updateDisplayedStats={this.handleUpdateDisplayedStats}
+          />
+        )}
+        <LayoutContainer {...this.props}>
+          <button type="button" onClick={this.resetRanks}>
+            Reset ranks
+          </button>
 
-            <DragDropContext onDragEnd={this.onDragEnd}>
-              <Droppable
-                droppableId="droppable"
-                isDropDisabled={ranksOrTrades === "trades"}
-              >
-                {(provided, snapshot) => (
-                  <StyledListContainer
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}
-                    pose={ranksOrTrades}
-                    initialPose="ranks"
-                  >
-                    <InnerList
-                      options={options}
-                      ranksToCompare={ranksToCompare}
-                      handleSaveOptions={this.handleSaveOptions}
-                      ranksOrTrades={ranksOrTrades}
-                    />
-                    {provided.placeholder}
-                  </StyledListContainer>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </LayoutContainer>
-        </ScrollSync>
+          <DragDropContext onDragEnd={this.onDragEnd}>
+            <Droppable
+              droppableId="droppable"
+              isDropDisabled={ranksOrTrades === "trades"}
+            >
+              {(provided, snapshot) => (
+                <StyledListContainer
+                  ref={provided.innerRef}
+                  style={getListStyle(snapshot.isDraggingOver)}
+                  pose={ranksOrTrades}
+                  initialPose="ranks"
+                >
+                  <InnerList
+                    options={options}
+                    ranksToCompare={ranksToCompare}
+                    handleSaveOptions={this.handleSaveOptions}
+                    ranksOrTrades={ranksOrTrades}
+                    statsArray={statsArray}
+                  />
+                  {provided.placeholder}
+                </StyledListContainer>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </LayoutContainer>
       </>
     );
   }
