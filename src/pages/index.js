@@ -1,4 +1,18 @@
+/* eslint class-methods-use-this: 0 */
+/* eslint no-nested-ternary: 0 */
+/* eslint consistent-return: 0 */
+/* eslint no-underscore-dangle: 0 */
+
 import React from "react";
+import {
+  Table,
+  Column,
+  AutoSizer,
+  ScrollSync,
+  Grid,
+  List
+} from "react-virtualized";
+import scrollbarSize from "dom-helpers/util/scrollbarSize";
 
 // import { PoseGroup } from "react-pose";
 // import styles from "./styles.module.css";
@@ -6,6 +20,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import posed from "react-pose";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/core/styles";
+import "react-virtualized/styles.css";
 
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Header from "../components/header";
@@ -18,6 +33,7 @@ import getAllOptions from "../services/getRanks";
 import InnerList from "../containers/InnerList";
 import StatSelector from "../containers/StatSelector";
 import availableStats from "../services/availableStats";
+import styles from "./styles.module.css";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -29,15 +45,15 @@ const reorder = (list, startIndex, endIndex) => {
 
 const grid = 8;
 
-const styles = theme => ({
-  root: {
-    flexGrow: 1
-  },
-  progress: {
-    margin: theme.spacing.unit * 2,
-    color: "#8c52ff"
-  }
-});
+// const styles = theme => ({
+//   root: {
+//     flexGrow: 1
+//   },
+//   progress: {
+//     margin: theme.spacing.unit * 2,
+//     color: "#8c52ff"
+//   }
+// });
 
 const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? "lightblue" : "lightgrey",
@@ -74,7 +90,15 @@ class Main extends React.Component {
     options: [{ id: 1 }],
     ranksToCompare: [{}],
     loading: false,
-    statsArray: availableStats
+    statsArray: availableStats,
+
+    columnWidth: 85,
+    columnCount: 50,
+    height: 500,
+    overscanColumnCount: 0,
+    overscanRowCount: 5,
+    rowHeight: 60,
+    rowCount: 100
   };
 
   optionsRef = null;
@@ -204,18 +228,215 @@ class Main extends React.Component {
     }));
   };
 
+  _renderLeftSideCell({ columnIndex, key, rowIndex, style }) {
+    const rowClass =
+      rowIndex % 2 === 0
+        ? columnIndex % 2 === 0
+          ? styles.evenRow
+          : styles.oddRow
+        : columnIndex % 2 !== 0
+        ? styles.evenRow
+        : styles.oddRow;
+    const classNames = rowClass;
+
+    return (
+      <div className={classNames} key={key} style={style}>
+        {`R${rowIndex}, C${columnIndex}`}
+      </div>
+    );
+  }
+
+  _renderBodyCell({ columnIndex, key, rowIndex, style }) {
+    if (columnIndex < 1) {
+      return;
+    }
+
+    return (
+      <div className={styles.oddRow} key={key} style={style}>
+        {`R${rowIndex}, C${columnIndex}`}
+      </div>
+    );
+  }
+
+  _renderLeftHeaderCell({ columnIndex, key, style }) {
+    return (
+      <div className={styles.headerCell} key={key} style={style}>
+        {`C${columnIndex}`}
+      </div>
+    );
+  }
+
+  _renderHeaderCell({ columnIndex, key, style }) {
+    if (columnIndex < 1) {
+      return;
+    }
+
+    return (
+      <div className={styles.headerCell} key={key} style={style}>
+        {`C${columnIndex}`}
+      </div>
+    );
+  }
+
   render() {
+    const { classes } = this.props;
     const {
       ranksOrTrades,
       options,
       ranksToCompare,
       loading,
-      statsArray
+      statsArray,
+      columnCount,
+      columnWidth,
+      height,
+      overscanColumnCount,
+      overscanRowCount,
+      rowHeight,
+      rowCount
     } = this.state;
-    const { classes } = this.props;
     return (
-      <>
-        {loading && <CircularProgress className={classes.progress} />}
+      <div>
+        <h2>Details</h2>
+
+        <ScrollSync>
+          {({
+            clientHeight,
+            clientWidth,
+            onScroll,
+            scrollHeight,
+            scrollLeft,
+            scrollTop,
+            scrollWidth
+          }) => {
+            const x = scrollLeft / (scrollWidth - clientWidth);
+            const y = scrollTop / (scrollHeight - clientHeight);
+
+            const leftBackgroundColor = "blue";
+            const leftColor = "#222";
+            const topBackgroundColor = "yellow";
+            const topColor = "#222";
+            const middleBackgroundColor = "red";
+            const middleColor = "#222";
+
+            return (
+              <LayoutContainer>
+                <div className={styles.GridRow}>
+                  {/* top left corner header labels-------------------------------------- */}
+
+                  <div
+                    className={styles.LeftSideGridContainer}
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: 0,
+                      color: leftColor,
+                      backgroundColor: topBackgroundColor
+                    }}
+                  >
+                    <Grid
+                      cellRenderer={this._renderLeftHeaderCell}
+                      className={styles.HeaderGrid}
+                      width={columnWidth}
+                      height={rowHeight}
+                      rowHeight={rowHeight}
+                      columnWidth={columnWidth}
+                      rowCount={1}
+                      columnCount={1}
+                    />
+                  </div>
+                  {/* end  top left corner header labels-------------------------------------- */}
+                  {/* left side header labels-------------------------------------- */}
+
+                  <div
+                    className={styles.LeftSideGridContainer}
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: rowHeight,
+                      color: leftColor,
+                      backgroundColor: leftBackgroundColor
+                    }}
+                  >
+                    <Grid
+                      overscanColumnCount={overscanColumnCount}
+                      overscanRowCount={overscanRowCount}
+                      cellRenderer={this._renderLeftSideCell}
+                      columnWidth={columnWidth}
+                      columnCount={1}
+                      className={styles.LeftSideGrid}
+                      height={height - scrollbarSize()}
+                      rowHeight={rowHeight}
+                      rowCount={rowCount}
+                      scrollTop={scrollTop}
+                      width={columnWidth}
+                    />
+                  </div>
+                  {/* left side header labels-------------------------------------- */}
+
+                  <div className={styles.GridColumn}>
+                    <AutoSizer disableHeight>
+                      {({ width }) => (
+                        <div>
+                          {/* top header labels-------------------------------------- */}
+                          <div
+                            style={{
+                              backgroundColor: topBackgroundColor,
+                              color: topColor,
+                              height: rowHeight,
+                              width: width - scrollbarSize()
+                            }}
+                          >
+                            <Grid
+                              className={styles.HeaderGrid}
+                              columnWidth={columnWidth}
+                              columnCount={columnCount}
+                              height={rowHeight}
+                              overscanColumnCount={overscanColumnCount}
+                              cellRenderer={this._renderHeaderCell}
+                              rowHeight={rowHeight}
+                              rowCount={1}
+                              scrollLeft={scrollLeft}
+                              width={width - scrollbarSize()}
+                            />
+                          </div>
+                          {/* end top header labels-------------------------------------- */}
+
+                          {/* body cells------------------------------------------------- */}
+                          <div
+                            style={{
+                              backgroundColor: middleBackgroundColor,
+                              color: middleColor,
+                              height,
+                              width
+                            }}
+                          >
+                            <Grid
+                              className={styles.BodyGrid}
+                              columnWidth={columnWidth}
+                              columnCount={columnCount}
+                              height={height}
+                              onScroll={onScroll}
+                              overscanColumnCount={overscanColumnCount}
+                              overscanRowCount={overscanRowCount}
+                              cellRenderer={this._renderBodyCell}
+                              rowHeight={rowHeight}
+                              rowCount={rowCount}
+                              width={width}
+                            />
+                          </div>
+                          {/* end body cells---------------------------------------------- */}
+                        </div>
+                      )}
+                    </AutoSizer>
+                  </div>
+                </div>
+              </LayoutContainer>
+            );
+          }}
+        </ScrollSync>
+      </div>
+      // <>
+      /* { {loading && <CircularProgress className={classes.progress} />}
         <Header changeRanksOrTrades={this.handleChangeRanksOrTrades} />
         <Background
           forRanksOrTrades="trades"
@@ -265,7 +486,7 @@ class Main extends React.Component {
             </Droppable>
           </DragDropContext>
         </LayoutContainer>
-      </>
+      </> } */
     );
   }
 }
